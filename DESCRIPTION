@@ -1,0 +1,22 @@
+Package: envirologgerr
+Type: Package
+Title: An R interface to the Envirologger JSON API
+Version: 0.0.4
+Date: 2016-06-21
+Authors@R: person("Stuart", "Grange", email = "s.k.grange@gmail.com", 
+    role = c("cre", "aut"))
+Description: An R package to make it easy to interface with the Envirologger 
+    JSON API
+License: GPL (>= 2)
+ByteCompile: true
+Imports:
+    stringr,
+    lubridate,
+    plyr,
+    dplyr,
+    jsonlite,
+    XML
+Suggests:
+    openair,
+    worldmet
+RoxygenNote: 5.0.1
