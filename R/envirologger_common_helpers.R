@@ -64,3 +64,13 @@ arrange_left <- function (df, variable) {
   df <- df[, c(c(index), (1:ncol(df))[-index])]
   df
 }
+
+
+replicate_rows <- function (df, n, reset = TRUE) {
+  if (reset) 
+    row.names(df) <- NULL
+  df <- df[rep(seq_len(nrow(df)), each = n), ]
+  if (reset) 
+    row.names(df) <- NULL
+  df
+}

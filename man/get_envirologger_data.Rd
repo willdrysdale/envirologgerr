@@ -5,7 +5,7 @@
 \title{Function to get data from Envirologger API.}
 \usage{
 get_envirologger_data(user, key, station, server, start = NA, end = NA,
-  tz = "UTC", extra = TRUE)
+  tz = "UTC", extra = TRUE, interval = "3 hour", progress = "time")
 }
 \arguments{
 \item{user}{Envirologger API user-name.}
@@ -20,11 +20,17 @@ get_envirologger_data(user, key, station, server, start = NA, end = NA,
 
 \item{end}{End date of query.}
 
-\item{tz}{Time-zone for dates.}
+\item{tz}{Time-zone for the observations' dates
+.}
 
 \item{extra}{Should the returned data frame contain extra infomation? Default
 is \code{TRUE} but setting to \code{FALSE} can be useful for packages such
 as \strong{openair}.}
+
+\item{interval}{How much data should the function request from the API for 
+each iteration? Default is \code{"3 hour"}.}
+
+\item{progress}{Type of progress bar to display. Default is \code{"time"}.}
 }
 \description{
 The Envirologger API is not fast.
@@ -32,7 +38,7 @@ The Envirologger API is not fast.
 \examples{
 \dontrun{
 
-# Get some data
+# Get some data for a made up station
 data_air <- get_envirologger_data(user, key, 1000, 100, start = "2016-06-20", 
                                   end = "2016-06-21")
 
