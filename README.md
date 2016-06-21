@@ -6,7 +6,7 @@
 
 ## Installation
 
-To install the development version: 
+To install the development version:
 
 ```
 # Install
