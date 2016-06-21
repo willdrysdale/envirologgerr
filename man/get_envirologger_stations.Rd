@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_envirologger_stations.R
 \name{get_envirologger_stations}
 \alias{get_envirologger_stations}
-\title{Function to get avalaible Envirologger monitoring stations.}
+\title{Function to get avalaible Envirologger monitoring stations for a user.}
 \usage{
 get_envirologger_stations(user, key)
 }
@@ -12,17 +12,20 @@ get_envirologger_stations(user, key)
 \item{key}{Envirologger API key for \code{user}.}
 }
 \description{
-Function to get avalaible Envirologger monitoring stations.
+Function to get avalaible Envirologger monitoring stations for a user.
 }
 \examples{
 \dontrun{
 
-get_envirologger_stations()
+get_envirologger_stations(user, key)
 
 }
 
 }
 \author{
 Stuart K. Grange
+}
+\seealso{
+\code{\link{get_envirologger_data}}
 }
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_envirologger_data.R
 \name{get_envirologger_data}
 \alias{get_envirologger_data}
-\title{Function to get data from Envirologger JSON API.}
+\title{Function to get data from Envirologger API.}
 \usage{
 get_envirologger_data(user, key, station, server, start = NA, end = NA,
   tz = "UTC", extra = TRUE)
@@ -27,12 +27,14 @@ is \code{TRUE} but setting to \code{FALSE} can be useful for packages such
 as \strong{openair}.}
 }
 \description{
-Function to get data from Envirologger JSON API.
+The Envirologger API is not fast.
 }
 \examples{
 \dontrun{
 
-get_envirologger_data()
+# Get some data
+data_air <- get_envirologger_data(user, key, 1000, 100, start = "2016-06-20", 
+                                  end = "2016-06-21")
 
 }
 
@@ -41,6 +43,7 @@ get_envirologger_data()
 Stuart K. Grange
 }
 \seealso{
-http://api.envirologger.net/2.0/documentation
+\href{http://api.envirologger.net/2.0/documentation}{Documentation},
+\code{\link{get_envirologger_stations}}
 }
 

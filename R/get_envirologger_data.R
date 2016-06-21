@@ -53,13 +53,13 @@ get_envirologger_data <- function(user, key, station, server, start = NA, end = 
   # Add base url
   query <- str_c(base_envirologger_url(user, key), query)
   
-  # Get data
-  df <- data.frame(query = query) %>%
-    rowwise() %>%
-    do(get_data_worker(url = .$query, tz = tz)) %>%
-    ungroup()
+  # # Get data
+  # df <- data.frame(query = query) %>%
+  #   rowwise() %>%
+  #   do(get_data_worker(url = .$query, tz = tz)) %>%
+  #   ungroup()
   
-  # df <- plyr::ldply(query, get_data_worker, tz = tz)
+  df <- plyr::ldply(query, get_data_worker, tz = tz)
   
   if (!nrow(df) == 0) {
     
