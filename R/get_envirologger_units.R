@@ -1,9 +1,19 @@
-#' Function to get units-data from Envirologger API. 
-#' 
-#' @param user Envirologger API user-name. 
-#' @param key Envirologger API key for \code{user}. 
+#' Function to get units data from Envirologger API. 
 #' 
 #' @author Stuart K. Grange
+#' 
+#' @param user An Envirologger API user-name. 
+#' 
+#' @param key An Envirologger API key for \code{user}. 
+#' 
+#' @return Data frame.
+#' 
+#' @examples 
+#' \dontrun{
+#' 
+#' get_envirologger_units(user, key)
+#' 
+#' }
 #' 
 #' @export
 get_envirologger_units <- function(user, key) {

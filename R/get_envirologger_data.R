@@ -1,33 +1,49 @@
-#' Function to get data from Envirologger API. 
+#' Function to get observational data from Envirologger API. 
 #' 
-#' The Envirologger API is not fast. 
+#' The Envirologger API is not fast and will take about a minute to download a
+#' day's worth of one-minute data. By default, this function only queries three-
+#' hours worth of data at a time to keep queries manageable for the API. If the
+#' amount of data requested is too high, the interface is unreliable as the API
+#' begins to raise error codes. 
 #' 
 #' @author Stuart K. Grange
 #' 
-#' @param user Envirologger API user-name. 
+#' @param user An Envirologger API user-name. 
 #' 
-#' @param key Envirologger API key for \code{user}. 
+#' @param key An Envirologger API key for \code{user}. 
 #' 
-#' @param station Station's data to download. 
+#' @param station A vector of station codes to download. Station codes are 
+#' integers and \code{\link{get_envirologger_stations}} can be used to find 
+#' these codes. 
 #' 
-#' @param server API server to use for download. 
+#' @param server An Envirologger API server code to use for download. Sever codes
+#' are integers and \code{\link{get_envirologger_stations}} can be used to find 
+#' these codes. 
 #' 
-#' @param start Start date of query.
+#' @param start What is the start date of data to be returned? Ideally, the 
+#' date format should be \code{yyyy-mm-dd}, but the UK locale convention of 
+#' \code{dd/mm/yyyy} will also work. Years as strings or integers work too and
+#' will floor-rounded. 
 #' 
-#' @param end End date of query. 
+#' @param end What is the end date of data to be returned? Ideally, the 
+#' date format should be \code{yyyy-mm-dd}, but the UK locale convention of 
+#' \code{dd/mm/yyyy} will also work. Years as strings or integers work too and 
+#' will be ceiling-rounded. 
 #' 
-#' @param tz Time-zone for the observations' dates
-#' .
-#' @param extra Should the returned data frame contain extra infomation? Default
-#' is \code{TRUE} but setting to \code{FALSE} can be useful for packages such
-#' as \strong{openair}. 
+#' @param tz Time-zone for the observations' dates. The default is \code{"UTC"}. 
+#' 
+#' @param extra Should the returned data frame contain extra information? Default
+#' is \code{TRUE}, but setting to \code{FALSE} can be useful for quick usage
+#' with \strong{openair}. 
 #' 
 #' @param interval How much data should the function request from the API for 
 #' each iteration? Default is \code{"3 hour"}. 
 #' 
 #' @param progress Type of progress bar to display. Default is \code{"time"}. 
 #' 
-#' @seealso \href{http://api.envirologger.net/2.0/documentation}{Documentation},
+#' @return Data frame with correct data types. 
+#' 
+#' @seealso \href{http://api.envirologger.net/2.0/documentation}{API Documentation},
 #' \code{\link{get_envirologger_stations}}
 #' 
 #' @examples 
@@ -123,10 +139,9 @@ build_query_urls <- function(user, key, server, station, start, end, interval) {
   # Push
   if (start == end) end <- end + lubridate::days(1)
   
-  # Create mapping data frame sequence
+  # Create mapping data frame
   df <- data.frame(date = seq(start, end, interval)) %>% 
     mutate(date_end = lead(date),
-           # date_end = date_end - 1,
            date = str_replace_all(date, "-|:| ", ""), 
            date_end = str_replace_all(date_end, "-|:| ", ""),
            date = str_sub(date, end = 10), 
@@ -222,7 +237,7 @@ get_data_worker <- function(url, tz) {
     
   } else {
     
-    # Return NULL
+    # Return NULL, reassign tryCatch
     df <- response
     
   }

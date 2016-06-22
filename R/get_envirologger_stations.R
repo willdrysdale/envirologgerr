@@ -1,11 +1,15 @@
-#' Function to get avalaible Envirologger monitoring stations for a user. 
+#' Function to get available Envirologger API monitoring stations for a user. 
 #' 
 #' @author Stuart K. Grange
 #' 
-#' @param user Envirologger API user-name. 
-#' @param key Envirologger API key for \code{user}. 
+#' @param user An Envirologger API user-name. 
 #' 
-#' @seealso \code{\link{get_envirologger_data}}
+#' @param key An Envirologger API key for \code{user}. 
+#' 
+#' @return Data frame with correct data types. 
+#' 
+#' @seealso \href{http://api.envirologger.net/2.0/documentation}{API Documentation},
+#' \code{\link{get_envirologger_data}}
 #' 
 #' @examples 
 #' \dontrun{

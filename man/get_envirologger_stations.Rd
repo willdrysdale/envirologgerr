@@ -2,17 +2,20 @@
 % Please edit documentation in R/get_envirologger_stations.R
 \name{get_envirologger_stations}
 \alias{get_envirologger_stations}
-\title{Function to get avalaible Envirologger monitoring stations for a user.}
+\title{Function to get available Envirologger API monitoring stations for a user.}
 \usage{
 get_envirologger_stations(user, key)
 }
 \arguments{
-\item{user}{Envirologger API user-name.}
+\item{user}{An Envirologger API user-name.}
 
-\item{key}{Envirologger API key for \code{user}.}
+\item{key}{An Envirologger API key for \code{user}.}
+}
+\value{
+Data frame with correct data types.
 }
 \description{
-Function to get avalaible Envirologger monitoring stations for a user.
+Function to get available Envirologger API monitoring stations for a user.
 }
 \examples{
 \dontrun{
@@ -26,6 +29,7 @@ get_envirologger_stations(user, key)
 Stuart K. Grange
 }
 \seealso{
+\href{http://api.envirologger.net/2.0/documentation}{API Documentation},
 \code{\link{get_envirologger_data}}
 }
 

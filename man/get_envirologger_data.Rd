@@ -2,38 +2,54 @@
 % Please edit documentation in R/get_envirologger_data.R
 \name{get_envirologger_data}
 \alias{get_envirologger_data}
-\title{Function to get data from Envirologger API.}
+\title{Function to get observational data from Envirologger API.}
 \usage{
 get_envirologger_data(user, key, station, server, start = NA, end = NA,
   tz = "UTC", extra = TRUE, interval = "3 hour", progress = "time")
 }
 \arguments{
-\item{user}{Envirologger API user-name.}
+\item{user}{An Envirologger API user-name.}
 
-\item{key}{Envirologger API key for \code{user}.}
+\item{key}{An Envirologger API key for \code{user}.}
 
-\item{station}{Station's data to download.}
+\item{station}{A vector of station codes to download. Station codes are 
+integers and \code{\link{get_envirologger_stations}} can be used to find 
+these codes.}
 
-\item{server}{API server to use for download.}
+\item{server}{An Envirologger API server code to use for download. Sever codes
+are integers and \code{\link{get_envirologger_stations}} can be used to find 
+these codes.}
 
-\item{start}{Start date of query.}
+\item{start}{What is the start date of data to be returned? Ideally, the 
+date format should be \code{yyyy-mm-dd}, but the UK locale convention of 
+\code{dd/mm/yyyy} will also work. Years as strings or integers work too and
+will floor-rounded.}
 
-\item{end}{End date of query.}
+\item{end}{What is the end date of data to be returned? Ideally, the 
+date format should be \code{yyyy-mm-dd}, but the UK locale convention of 
+\code{dd/mm/yyyy} will also work. Years as strings or integers work too and 
+will be ceiling-rounded.}
 
-\item{tz}{Time-zone for the observations' dates
-.}
+\item{tz}{Time-zone for the observations' dates. The default is \code{"UTC"}.}
 
-\item{extra}{Should the returned data frame contain extra infomation? Default
-is \code{TRUE} but setting to \code{FALSE} can be useful for packages such
-as \strong{openair}.}
+\item{extra}{Should the returned data frame contain extra information? Default
+is \code{TRUE}, but setting to \code{FALSE} can be useful for quick usage
+with \strong{openair}.}
 
 \item{interval}{How much data should the function request from the API for 
 each iteration? Default is \code{"3 hour"}.}
 
 \item{progress}{Type of progress bar to display. Default is \code{"time"}.}
 }
+\value{
+Data frame with correct data types.
+}
 \description{
-The Envirologger API is not fast.
+The Envirologger API is not fast and will take about a minute to download a
+day's worth of one-minute data. By default, this function only queries three-
+hours worth of data at a time to keep queries manageable for the API. If the
+amount of data requested is too high, the interface is unreliable as the API
+begins to raise error codes.
 }
 \examples{
 \dontrun{
@@ -49,7 +65,7 @@ data_air <- get_envirologger_data(user, key, 1000, 100, start = "2016-06-20",
 Stuart K. Grange
 }
 \seealso{
-\href{http://api.envirologger.net/2.0/documentation}{Documentation},
+\href{http://api.envirologger.net/2.0/documentation}{API Documentation},
 \code{\link{get_envirologger_stations}}
 }
 

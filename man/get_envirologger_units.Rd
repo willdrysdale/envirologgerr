@@ -2,17 +2,28 @@
 % Please edit documentation in R/get_envirologger_units.R
 \name{get_envirologger_units}
 \alias{get_envirologger_units}
-\title{Function to get units-data from Envirologger API.}
+\title{Function to get units data from Envirologger API.}
 \usage{
 get_envirologger_units(user, key)
 }
 \arguments{
-\item{user}{Envirologger API user-name.}
+\item{user}{An Envirologger API user-name.}
 
-\item{key}{Envirologger API key for \code{user}.}
+\item{key}{An Envirologger API key for \code{user}.}
+}
+\value{
+Data frame.
 }
 \description{
-Function to get units-data from Envirologger API.
+Function to get units data from Envirologger API.
+}
+\examples{
+\dontrun{
+
+get_envirologger_units(user, key)
+
+}
+
 }
 \author{
 Stuart K. Grange
