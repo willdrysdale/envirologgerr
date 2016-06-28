@@ -4,7 +4,7 @@
 #' day's worth of one-minute data. By default, this function only queries three-
 #' hours worth of data at a time to keep queries manageable for the API. If the
 #' amount of data requested is too high, the interface is unreliable as the API
-#' begins to raise error codes. 
+#' begins to raise error codes and can hang. 
 #' 
 #' @author Stuart K. Grange
 #' 
@@ -36,6 +36,12 @@
 #' is \code{TRUE}, but setting to \code{FALSE} can be useful for quick usage
 #' with \strong{openair}. 
 #' 
+#' @param clean Should \code{\link{clean_envirologger_data}} be run on the 
+#' returned data? \code{clean} will only work when \code{extra} is \code{TRUE}. 
+#' 
+#' @param drop When \code{extra} is \code{TRUE}, should mostly unneeded variables
+#' be dropped? 
+#' 
 #' @param interval How much data should the function request from the API for 
 #' each iteration? Default is \code{"3 hour"}. 
 #' 
@@ -61,7 +67,8 @@
 #' 
 #' @export
 get_envirologger_data <- function(user, key, station, server, start = NA, end = NA, 
-                                  tz = "UTC", extra = TRUE, interval = "3 hour", 
+                                  tz = "UTC", extra = TRUE, clean = FALSE, 
+                                  drop = FALSE, interval = "3 hour", 
                                   progress = "time") {
   
   # Build query strings for api
@@ -87,12 +94,14 @@ get_envirologger_data <- function(user, key, station, server, start = NA, end = 
       
       df <- tryCatch({
         
+        # Spread
         df %>% 
           select(date,
                  station,
                  label,
                  value) %>% 
           tidyr::spread(label, value)
+        
         
       }, error = function(e) {
         
@@ -111,6 +120,23 @@ get_envirologger_data <- function(user, key, station, server, start = NA, end = 
           tidyr::spread(label, value)
         
       })
+      
+    } else {
+      
+      # Run a cleaning function
+      if (clean) df <- clean_envirologger_data(df)
+      
+      if (drop & !clean) {
+        
+        # Drop some things I do not use much
+        df <- df %>% 
+          select(-slope,
+                 -offset,
+                 -channel_number,
+                 -sensor,
+                 -unit)
+        
+      }
       
     }
     
@@ -203,10 +229,12 @@ get_data_worker <- function(url, tz) {
     
   }, warning = function(w) {
     
+    # Return
     NULL
     
   }, error = function(e) {
     
+    # Return
     NULL
     
   })
@@ -226,7 +254,7 @@ get_data_worker <- function(url, tz) {
     # Get observations
     df <- response$Channels
     
-    # Insert date into observations
+    # Insert date into observations, odd code
     df <- mapply(cbind, df, "date" = date, SIMPLIFY = FALSE)
     
     # Create data frame

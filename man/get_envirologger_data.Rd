@@ -5,7 +5,8 @@
 \title{Function to get observational data from Envirologger API.}
 \usage{
 get_envirologger_data(user, key, station, server, start = NA, end = NA,
-  tz = "UTC", extra = TRUE, interval = "3 hour", progress = "time")
+  tz = "UTC", extra = TRUE, clean = FALSE, drop = FALSE,
+  interval = "3 hour", progress = "time")
 }
 \arguments{
 \item{user}{An Envirologger API user-name.}
@@ -36,6 +37,12 @@ will be ceiling-rounded.}
 is \code{TRUE}, but setting to \code{FALSE} can be useful for quick usage
 with \strong{openair}.}
 
+\item{clean}{Should \code{\link{clean_envirologger_data}} be run on the 
+returned data? \code{clean} will only work when \code{extra} is \code{TRUE}.}
+
+\item{drop}{When \code{extra} is \code{TRUE}, should mostly unneeded variables
+be dropped?}
+
 \item{interval}{How much data should the function request from the API for 
 each iteration? Default is \code{"3 hour"}.}
 
@@ -49,7 +56,7 @@ The Envirologger API is not fast and will take about a minute to download a
 day's worth of one-minute data. By default, this function only queries three-
 hours worth of data at a time to keep queries manageable for the API. If the
 amount of data requested is too high, the interface is unreliable as the API
-begins to raise error codes.
+begins to raise error codes and can hang.
 }
 \examples{
 \dontrun{
