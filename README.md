@@ -2,8 +2,7 @@
 
 [![Build Status](https://travis-ci.org/skgrange/envirologgerr.svg?branch=master)](https://travis-ci.org/skgrange/envirologgerr)
 
-**envirologgerr** is an R interface to the [Envirologger](http://www.envirologger.com/home) [API](http://api.envirologger.net/2.0/documentation). **envirologgerr** interfaces with
-the default JSON interface and uses the excellent [**jsonlite**](https://github.com/jeroenooms/jsonlite) package to parse the data format into friendly data frames (tables).
+**envirologgerr** is an R interface to the [Envirologger](http://www.envirologger.com/home) [API](http://api.envirologger.net/2.0/documentation). **envirologgerr** interfaces with the default JSON interface and uses the [**jsonlite**](https://github.com/jeroenooms/jsonlite) package to parse the data format into friendly data frames (tables).
 
 To gain access to the API, credentials are needed in the form of a user and key (also called account and licence keys). 
 
@@ -29,6 +28,6 @@ data_test <- get_envirologger_stations(user, key, station = c(1000, 1001),
 
 This will return all variables available for the two stations between the date periods. 
 
-The main helper function is `get_envirologger_stations` and returns a table containing integer keys/codes for the stations and servers which are available for a particular user.  
+The main helper function is `get_envirologger_stations` and returns a table containing integer keys/codes for the stations and servers which are available for a particular user.
 
-**envirologgerr** and [**smonitor**](https://github.com/skgrange/smonitor) work well together. 
+**envirologgerr** and [**smonitor**](https://github.com/skgrange/smonitor) work well together.
