@@ -1,7 +1,8 @@
 #' Function to clean a data frame returned by \code{get_envirologger_data}. 
 #' 
 #' \code{clean_envirologger_data} creates a variable variable/column with help
-#' of a look-up table and treats statuses as observations. 
+#' of a look-up table and treats statuses as observations and will remove true
+#' duplicate observations. 
 #' 
 #' @param df Data frame returned by \code{get_envirologger_data}. 
 #' 
@@ -46,14 +47,15 @@ clean_envirologger_data <- function(df) {
             variable) %>% 
     threadr::arrange_left(c("date", "station", "variable", "value"))
   
-  # # %>% 
-  # select(-slope,
-  #        -offset,
-  #        -channel_number,
-  #        -unit,
-  #        -sensor,
-  #        -label)
-  
+  # Remove true value duplicates, added to data getter function quite early on 
+  # too. May remove soon. 
+  df <- df %>% 
+    distinct(date,
+             station,
+             variable,
+             value,
+             .keep_all = TRUE)
+
   # Return
   df
   

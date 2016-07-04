@@ -18,6 +18,7 @@ devtools::install_github("skgrange/envirologgerr")
 ## Usage
 
 **envirologgerr**'s primary function is `get_envirologger_data`. `get_envirologger_data` allows a user to easily query the API for stations' data between date periods. For example:
+
 ```
 # Define user and key...
 

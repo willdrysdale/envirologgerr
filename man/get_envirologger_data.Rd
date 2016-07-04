@@ -5,8 +5,8 @@
 \title{Function to get observational data from Envirologger API.}
 \usage{
 get_envirologger_data(user, key, station, server, start = NA, end = NA,
-  tz = "UTC", extra = TRUE, clean = FALSE, drop = FALSE,
-  interval = "3 hour", progress = "time")
+  tz = "UTC", extra = TRUE, clean = FALSE, drop_duplicates = TRUE,
+  drop = FALSE, interval = "3 hour", progress = "time")
 }
 \arguments{
 \item{user}{An Envirologger API user-name.}
@@ -39,6 +39,9 @@ with \strong{openair}.}
 
 \item{clean}{Should \code{\link{clean_envirologger_data}} be run on the 
 returned data? \code{clean} will only work when \code{extra} is \code{TRUE}.}
+
+\item{drop_duplicates}{Should "true" date-station-variable duplicates be 
+removed? Default is \code{TRUE} as is common.}
 
 \item{drop}{When \code{extra} is \code{TRUE}, should mostly unneeded variables
 be dropped?}

@@ -39,6 +39,9 @@
 #' @param clean Should \code{\link{clean_envirologger_data}} be run on the 
 #' returned data? \code{clean} will only work when \code{extra} is \code{TRUE}. 
 #' 
+#' @param drop_duplicates Should "true" date-station-variable duplicates be 
+#' removed? Default is \code{TRUE} as is common. 
+#' 
 #' @param drop When \code{extra} is \code{TRUE}, should mostly unneeded variables
 #' be dropped? 
 #' 
@@ -68,8 +71,8 @@
 #' @export
 get_envirologger_data <- function(user, key, station, server, start = NA, end = NA, 
                                   tz = "UTC", extra = TRUE, clean = FALSE, 
-                                  drop = FALSE, interval = "3 hour", 
-                                  progress = "time") {
+                                  drop_duplicates = TRUE, drop = FALSE, 
+                                  interval = "3 hour", progress = "time") {
   
   # Build query strings for api
   urls <- build_query_urls(user, key, server, station, start, end, interval)
@@ -86,6 +89,19 @@ get_envirologger_data <- function(user, key, station, server, start = NA, end = 
     # Lower case and trim
     df$label <- str_to_lower(df$label)
     df$label <- str_trim(df$label)
+    
+    # Remove true value duplicates
+    if (drop_duplicates) {
+      
+      df <- df %>% 
+        distinct(date,
+                 station,
+                 label,
+                 sensor,
+                 value,
+                 .keep_all = TRUE)
+      
+    }
     
     # Arrange
     df <- arrange_left(df, c("date", "station", "label", "sensor", "value"))
@@ -165,14 +181,20 @@ build_query_urls <- function(user, key, server, station, start, end, interval) {
   # Push
   if (start == end) end <- end + lubridate::days(1)
   
-  # Create mapping data frame
+  # Create mapping data frame, quite a bit of work and there still is overlap
   df <- data.frame(date = seq(start, end, interval)) %>% 
     mutate(date_end = lead(date),
+           date_end_lag = lag(date_end),
+           date_end_lag = ifelse(is.na(date_end_lag), date_end, date_end_lag),
+           date = ifelse(is.na(date), date_end, date),
+           date = ifelse(date == date_end_lag, date + 60, date),
+           date = as.POSIXct(date, tz = "UTC", origin = "1970-01-01"),
            date = str_replace_all(date, "-|:| ", ""), 
            date_end = str_replace_all(date_end, "-|:| ", ""),
-           date = str_sub(date, end = 10), 
-           date_end = str_sub(date_end, end = 10)) %>% 
-    filter(!is.na(date_end))
+           date = str_sub(date, end = 12), 
+           date_end = str_sub(date_end, end = 12)) %>% 
+    filter(!is.na(date_end)) %>% 
+    select(-date_end_lag)
   
   # Vectorise over site too
   if (length(station) == 1) {

@@ -11,7 +11,8 @@ clean_envirologger_data(df)
 }
 \description{
 \code{clean_envirologger_data} creates a variable variable/column with help
-of a look-up table and treats statuses as observations.
+of a look-up table and treats statuses as observations and will remove true
+duplicate observations.
 }
 \author{
 Stuart K. Grange
