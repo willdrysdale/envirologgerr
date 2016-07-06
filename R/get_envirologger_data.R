@@ -12,12 +12,12 @@
 #' 
 #' @param key An Envirologger API key for \code{user}. 
 #' 
+#' @param server An Envirologger API server code to use for download. Server 
+#' codes are integers and \code{\link{get_envirologger_stations}} can be used to 
+#' find these codes. 
+#' 
 #' @param station A vector of station codes to download. Station codes are 
 #' integers and \code{\link{get_envirologger_stations}} can be used to find 
-#' these codes. 
-#' 
-#' @param server An Envirologger API server code to use for download. Sever codes
-#' are integers and \code{\link{get_envirologger_stations}} can be used to find 
 #' these codes. 
 #' 
 #' @param start What is the start date of data to be returned? Ideally, the 
@@ -40,10 +40,10 @@
 #' returned data? \code{clean} will only work when \code{extra} is \code{TRUE}. 
 #' 
 #' @param drop_duplicates Should "true" date-station-variable duplicates be 
-#' removed? Default is \code{TRUE} as is common. 
+#' removed? Default is \code{TRUE} as this is common. 
 #' 
-#' @param drop When \code{extra} is \code{TRUE}, should mostly unneeded variables
-#' be dropped? 
+#' @param drop Should mostly unneeded variables be dropped when \code{extra} is
+#' code{TRUE}? Default is \code{FALSE}. 
 #' 
 #' @param interval How much data should the function request from the API for 
 #' each iteration? Default is \code{"3 hour"}. 
@@ -69,10 +69,11 @@
 #' @importFrom jsonlite fromJSON
 #' 
 #' @export
-get_envirologger_data <- function(user, key, station, server, start = NA, end = NA, 
-                                  tz = "UTC", extra = TRUE, clean = FALSE, 
-                                  drop_duplicates = TRUE, drop = FALSE, 
-                                  interval = "3 hour", progress = "time") {
+get_envirologger_data <- function(user, key, server, station, start = NA, 
+                                  end = NA, tz = "UTC", extra = TRUE, 
+                                  clean = FALSE, drop_duplicates = TRUE, 
+                                  drop = FALSE, interval = "3 hour", 
+                                  progress = "time") {
   
   # Build query strings for api
   urls <- build_query_urls(user, key, server, station, start, end, interval)
@@ -142,7 +143,7 @@ get_envirologger_data <- function(user, key, station, server, start = NA, end = 
       # Run a cleaning function
       if (clean) df <- clean_envirologger_data(df)
       
-      if (drop & !clean) {
+      if (drop) {
         
         # Drop some things I do not use much
         df <- df %>% 
@@ -287,7 +288,7 @@ get_data_worker <- function(url, tz) {
     
   } else {
     
-    # Return NULL, reassign tryCatch
+    # Return NULL, reassign tryCatch return
     df <- response
     
   }
