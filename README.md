@@ -4,7 +4,7 @@
 
 **envirologgerr** is an R interface to the [Envirologger](http://www.envirologger.com/home) [API](http://api.envirologger.net/2.0/documentation). **envirologgerr** interfaces with the default JSON interface and uses the [**jsonlite**](https://github.com/jeroenooms/jsonlite) package to parse the data format into friendly data frames (tables).
 
-To gain access to the API, credentials are needed in the form of a user and key (also called account and licence keys). 
+To gain access to the API, credentials are needed in the form of a user and key (also called account and licence keys).
 
 ## Installation
 
