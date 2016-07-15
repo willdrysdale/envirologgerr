@@ -43,7 +43,7 @@
 #' removed? Default is \code{TRUE} as this is common. 
 #' 
 #' @param drop Should mostly unneeded variables be dropped when \code{extra} is
-#' code{TRUE}? Default is \code{FALSE}. 
+#' \code{TRUE}? Default is \code{FALSE}. 
 #' 
 #' @param interval How much data should the function request from the API for 
 #' each iteration? Default is \code{"3 hour"}. 
@@ -59,7 +59,7 @@
 #' \dontrun{
 #' 
 #' # Get some data for a made up station
-#' data_air <- get_envirologger_data(user, key, 1000, 100, start = "2016-06-20", 
+#' data_air <- get_envirologger_data(user, key, 100, 1000, start = "2016-06-20", 
 #'                                   end = "2016-06-21")
 #' 
 #' }
@@ -179,8 +179,12 @@ build_query_urls <- function(user, key, server, station, start, end, interval) {
   start <- parse_date_arguments(start, "start")
   end <- parse_date_arguments(end, "end")
   
-  # Push
+  # Push end date if needed
   if (start == end) end <- end + lubridate::days(1)
+  
+  # Round to 3 hour periods
+  # start <- plyr::round_any(start, 10800, f = floor)
+  # end <- plyr::round_any(end, 10800, f = ceiling)
   
   # Create mapping data frame, quite a bit of work and there still is overlap
   df <- data.frame(date = seq(start, end, interval)) %>% 
@@ -192,10 +196,11 @@ build_query_urls <- function(user, key, server, station, start, end, interval) {
            date = as.POSIXct(date, tz = "UTC", origin = "1970-01-01"),
            date = str_replace_all(date, "-|:| ", ""), 
            date_end = str_replace_all(date_end, "-|:| ", ""),
-           date = str_sub(date, end = 12), 
-           date_end = str_sub(date_end, end = 12)) %>% 
+           date = str_sub(date, end = 10), 
+           date_end = str_sub(date_end, end = 10)) %>% 
     filter(!is.na(date_end)) %>% 
     select(-date_end_lag)
+  # Could use end = 12, but issues arrise, first query is ignored. API behaviour? 
   
   # Vectorise over site too
   if (length(station) == 1) {
@@ -277,7 +282,7 @@ get_data_worker <- function(url, tz) {
     # Get observations
     df <- response$Channels
     
-    # Insert date into observations, odd code
+    # Insert date into observations, an odd piece of code
     df <- mapply(cbind, df, "date" = date, SIMPLIFY = FALSE)
     
     # Create data frame

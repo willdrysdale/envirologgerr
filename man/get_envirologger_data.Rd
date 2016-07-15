@@ -4,7 +4,7 @@
 \alias{get_envirologger_data}
 \title{Function to get observational data from Envirologger API.}
 \usage{
-get_envirologger_data(user, key, station, server, start = NA, end = NA,
+get_envirologger_data(user, key, server, station, start = NA, end = NA,
   tz = "UTC", extra = TRUE, clean = FALSE, drop_duplicates = TRUE,
   drop = FALSE, interval = "3 hour", progress = "time")
 }
@@ -13,12 +13,12 @@ get_envirologger_data(user, key, station, server, start = NA, end = NA,
 
 \item{key}{An Envirologger API key for \code{user}.}
 
+\item{server}{An Envirologger API server code to use for download. Server 
+codes are integers and \code{\link{get_envirologger_stations}} can be used to 
+find these codes.}
+
 \item{station}{A vector of station codes to download. Station codes are 
 integers and \code{\link{get_envirologger_stations}} can be used to find 
-these codes.}
-
-\item{server}{An Envirologger API server code to use for download. Sever codes
-are integers and \code{\link{get_envirologger_stations}} can be used to find 
 these codes.}
 
 \item{start}{What is the start date of data to be returned? Ideally, the 
@@ -41,10 +41,10 @@ with \strong{openair}.}
 returned data? \code{clean} will only work when \code{extra} is \code{TRUE}.}
 
 \item{drop_duplicates}{Should "true" date-station-variable duplicates be 
-removed? Default is \code{TRUE} as is common.}
+removed? Default is \code{TRUE} as this is common.}
 
-\item{drop}{When \code{extra} is \code{TRUE}, should mostly unneeded variables
-be dropped?}
+\item{drop}{Should mostly unneeded variables be dropped when \code{extra} is
+\code{TRUE}? Default is \code{FALSE}.}
 
 \item{interval}{How much data should the function request from the API for 
 each iteration? Default is \code{"3 hour"}.}
@@ -65,7 +65,7 @@ begins to raise error codes and can hang.
 \dontrun{
 
 # Get some data for a made up station
-data_air <- get_envirologger_data(user, key, 1000, 100, start = "2016-06-20", 
+data_air <- get_envirologger_data(user, key, 100, 1000, start = "2016-06-20", 
                                   end = "2016-06-21")
 
 }
