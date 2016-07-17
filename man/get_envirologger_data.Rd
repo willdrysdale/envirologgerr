@@ -5,8 +5,8 @@
 \title{Function to get observational data from Envirologger API.}
 \usage{
 get_envirologger_data(user, key, server, station, start = NA, end = NA,
-  tz = "UTC", extra = TRUE, clean = FALSE, drop_duplicates = TRUE,
-  drop = FALSE, interval = "3 hour", progress = "time")
+  tz = "UTC", remove_duplicates = TRUE, interval = "3 hour",
+  progress = "time")
 }
 \arguments{
 \item{user}{An Envirologger API user-name.}
@@ -33,18 +33,8 @@ will be ceiling-rounded.}
 
 \item{tz}{Time-zone for the observations' dates. The default is \code{"UTC"}.}
 
-\item{extra}{Should the returned data frame contain extra information? Default
-is \code{TRUE}, but setting to \code{FALSE} can be useful for quick usage
-with \strong{openair}.}
-
-\item{clean}{Should \code{\link{clean_envirologger_data}} be run on the 
-returned data? \code{clean} will only work when \code{extra} is \code{TRUE}.}
-
-\item{drop_duplicates}{Should "true" date-station-variable duplicates be 
-removed? Default is \code{TRUE} as this is common.}
-
-\item{drop}{Should mostly unneeded variables be dropped when \code{extra} is
-\code{TRUE}? Default is \code{FALSE}.}
+\item{remove_duplicates}{Should "true" date-station-variable-value duplicates
+be removed? Default is \code{TRUE} as this is common.}
 
 \item{interval}{How much data should the function request from the API for 
 each iteration? Default is \code{"3 hour"}.}

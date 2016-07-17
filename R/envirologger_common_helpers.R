@@ -45,6 +45,7 @@ parse_date_arguments <- function (date, type, tz = "UTC") {
   date
 }
 
+
 str_underscore <- function(x) {
   x <- gsub("([A-Za-z])([A-Z])([a-z])", "\\1_\\2\\3", x)
   x <- gsub(".", "_", x, fixed = TRUE)

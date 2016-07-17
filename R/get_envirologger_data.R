@@ -30,20 +30,10 @@
 #' \code{dd/mm/yyyy} will also work. Years as strings or integers work too and 
 #' will be ceiling-rounded. 
 #' 
-#' @param tz Time-zone for the observations' dates. The default is \code{"UTC"}. 
+#' @param tz Time-zone for the observations' dates. The default is \code{"UTC"}.
 #' 
-#' @param extra Should the returned data frame contain extra information? Default
-#' is \code{TRUE}, but setting to \code{FALSE} can be useful for quick usage
-#' with \strong{openair}. 
-#' 
-#' @param clean Should \code{\link{clean_envirologger_data}} be run on the 
-#' returned data? \code{clean} will only work when \code{extra} is \code{TRUE}. 
-#' 
-#' @param drop_duplicates Should "true" date-station-variable duplicates be 
-#' removed? Default is \code{TRUE} as this is common. 
-#' 
-#' @param drop Should mostly unneeded variables be dropped when \code{extra} is
-#' \code{TRUE}? Default is \code{FALSE}. 
+#' @param remove_duplicates Should "true" date-station-variable-value duplicates
+#' be removed? Default is \code{TRUE} as this is common. 
 #' 
 #' @param interval How much data should the function request from the API for 
 #' each iteration? Default is \code{"3 hour"}. 
@@ -70,10 +60,8 @@
 #' 
 #' @export
 get_envirologger_data <- function(user, key, server, station, start = NA, 
-                                  end = NA, tz = "UTC", extra = TRUE, 
-                                  clean = FALSE, drop_duplicates = TRUE, 
-                                  drop = FALSE, interval = "3 hour", 
-                                  progress = "time") {
+                                  end = NA, tz = "UTC", remove_duplicates = TRUE, 
+                                  interval = "3 hour", progress = "time") {
   
   # Build query strings for api
   urls <- build_query_urls(user, key, server, station, start, end, interval)
@@ -92,13 +80,12 @@ get_envirologger_data <- function(user, key, server, station, start = NA,
     df$label <- str_trim(df$label)
     
     # Remove true value duplicates
-    if (drop_duplicates) {
+    if (remove_duplicates) {
       
       df <- df %>% 
         distinct(date,
                  station,
-                 label,
-                 sensor,
+                 channel_number,
                  value,
                  .keep_all = TRUE)
       
@@ -106,56 +93,6 @@ get_envirologger_data <- function(user, key, server, station, start = NA,
     
     # Arrange
     df <- arrange_left(df, c("date", "station", "label", "sensor", "value"))
-    
-    if (!extra) {
-      
-      df <- tryCatch({
-        
-        # Spread
-        df %>% 
-          select(date,
-                 station,
-                 label,
-                 value) %>% 
-          tidyr::spread(label, value)
-        
-        
-      }, error = function(e) {
-        
-        # Warning to the user
-        warning("Duplicate date-station-label observations detected, data have been removed.", 
-                call. = FALSE)
-        
-        df %>% 
-          select(date,
-                 station,
-                 label,
-                 value) %>% 
-          distinct(date,
-                   station, 
-                   label) %>% 
-          tidyr::spread(label, value)
-        
-      })
-      
-    } else {
-      
-      # Run a cleaning function
-      if (clean) df <- clean_envirologger_data(df)
-      
-      if (drop) {
-        
-        # Drop some things I do not use much
-        df <- df %>% 
-          select(-slope,
-                 -offset,
-                 -channel_number,
-                 -sensor,
-                 -unit)
-        
-      }
-      
-    }
     
   } else {
     
@@ -181,10 +118,6 @@ build_query_urls <- function(user, key, server, station, start, end, interval) {
   
   # Push end date if needed
   if (start == end) end <- end + lubridate::days(1)
-  
-  # Round to 3 hour periods
-  # start <- plyr::round_any(start, 10800, f = floor)
-  # end <- plyr::round_any(end, 10800, f = ceiling)
   
   # Create mapping data frame, quite a bit of work and there still is overlap
   df <- data.frame(date = seq(start, end, interval)) %>% 
@@ -270,26 +203,41 @@ get_data_worker <- function(url, tz) {
   # If we get a return, make a nice data frame
   if (!is.null(response)) {
     
-    # Parse text
-    response <- fromJSON(response)
+    # Catch is for rare issues with EOF errors caused by api
+    response <- tryCatch({
+      
+      # Parse
+      fromJSON(response)
+      
+    }, error = function(e) {
+      
+      # Return
+      NULL
+      
+    })
     
-    # Get dates
-    date <- response$Timestamp
-    
-    # Parse dates
-    date <- lubridate::ymd_hms(date, tz = tz)
-    
-    # Get observations
-    df <- response$Channels
-    
-    # Insert date into observations, an odd piece of code
-    df <- mapply(cbind, df, "date" = date, SIMPLIFY = FALSE)
-    
-    # Create data frame
-    df <- bind_rows(df)
-    
-    # Add station key
-    df$station <- station
+    # Another catch
+    if (!is.null(response)) {
+      
+      # Get dates
+      date <- response$Timestamp
+      
+      # Parse dates
+      date <- lubridate::ymd_hms(date, tz = tz)
+      
+      # Get observations
+      df <- response$Channels
+      
+      # Insert date into observations, an odd piece of code
+      df <- mapply(cbind, df, "date" = date, SIMPLIFY = FALSE)
+      
+      # Create data frame
+      df <- bind_rows(df)
+      
+      # Add station key
+      df$station <- station
+      
+    }
     
   } else {
     
