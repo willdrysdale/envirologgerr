@@ -23,7 +23,7 @@ devtools::install_github("skgrange/envirologgerr")
 # Define user and key...
 
 # Get some data for two made up stations
-data_test <- get_envirologger_stations(user, key, station = c(1000, 1001), 
+data_test <- get_envirologger_data(user, key, station = c(1000, 1001), 
   server = 1, start = "2016-05-01", end = "2016-05-15")
 ```
 
