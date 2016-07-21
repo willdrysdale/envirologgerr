@@ -40,6 +40,9 @@
 #' 
 #' @param progress Type of progress bar to display. Default is \code{"time"}. 
 #' 
+#' @param query_print Should the API query strings be printed? Default is 
+#' \code{FALSE}. 
+#' 
 #' @return Data frame with correct data types. 
 #' 
 #' @seealso \href{http://api.envirologger.net/2.0/documentation}{API Documentation},
@@ -61,13 +64,15 @@
 #' @export
 get_envirologger_data <- function(user, key, server, station, start = NA, 
                                   end = NA, tz = "UTC", remove_duplicates = TRUE, 
-                                  interval = "3 hour", progress = "time") {
+                                  interval = "3 hour", progress = "time",
+                                  query_print = FALSE) {
   
   # Build query strings for api
   urls <- build_query_urls(user, key, server, station, start, end, interval)
   
   # Get data
-  df <- plyr::ldply(urls, get_data_worker, tz = tz, .progress = progress)
+  df <- plyr::ldply(urls, get_data_worker, tz = tz, query_print = query_print, 
+                    .progress = progress)
   
   if (!nrow(df) == 0) {
     
@@ -97,7 +102,7 @@ get_envirologger_data <- function(user, key, server, station, start = NA,
   } else {
     
     # No data to return
-    df <- NULL
+    df <- data.frame()
     
   }
   
@@ -170,7 +175,10 @@ build_query_urls <- function(user, key, server, station, start, end, interval) {
 # Function to get read json return and format into a data frame 
 #
 # No export
-get_data_worker <- function(url, tz) {
+get_data_worker <- function(url, tz, query_print) {
+  
+  # Message query string
+  if (query_print) message(url)
   
   # Get station from url
   station <- str_split_fixed(url, "/", 13)[, 11]
@@ -241,8 +249,8 @@ get_data_worker <- function(url, tz) {
     
   } else {
     
-    # Return NULL, reassign tryCatch return
-    df <- response
+    # Return empty data frame, reassign tryCatch return
+    df <- data.frame()
     
   }
   

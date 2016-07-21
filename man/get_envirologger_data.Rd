@@ -6,7 +6,7 @@
 \usage{
 get_envirologger_data(user, key, server, station, start = NA, end = NA,
   tz = "UTC", remove_duplicates = TRUE, interval = "3 hour",
-  progress = "time")
+  progress = "time", query_print = FALSE)
 }
 \arguments{
 \item{user}{An Envirologger API user-name.}
@@ -40,6 +40,9 @@ be removed? Default is \code{TRUE} as this is common.}
 each iteration? Default is \code{"3 hour"}.}
 
 \item{progress}{Type of progress bar to display. Default is \code{"time"}.}
+
+\item{query_print}{Should the API query strings be printed? Default is 
+\code{FALSE}.}
 }
 \value{
 Data frame with correct data types.
