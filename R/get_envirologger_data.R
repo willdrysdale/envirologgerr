@@ -40,7 +40,7 @@
 #' 
 #' @param progress Type of progress bar to display. Default is \code{"time"}. 
 #' 
-#' @param query_print Should the API query strings be printed? Default is 
+#' @param print_query Should the API query strings be printed? Default is 
 #' \code{FALSE}. 
 #' 
 #' @return Data frame with correct data types. 
@@ -65,13 +65,13 @@
 get_envirologger_data <- function(user, key, server, station, start = NA, 
                                   end = NA, tz = "UTC", remove_duplicates = TRUE, 
                                   interval = "3 hour", progress = "time",
-                                  query_print = FALSE) {
+                                  print_query = FALSE) {
   
   # Build query strings for api
   urls <- build_query_urls(user, key, server, station, start, end, interval)
   
   # Get data
-  df <- plyr::ldply(urls, get_data_worker, tz = tz, query_print = query_print, 
+  df <- plyr::ldply(urls, get_data_worker, tz = tz, print_query = print_query, 
                     .progress = progress)
   
   if (!nrow(df) == 0) {
@@ -122,7 +122,15 @@ build_query_urls <- function(user, key, server, station, start, end, interval) {
   end <- parse_date_arguments(end, "end")
   
   # Push end date if needed
+  # For when both na
   if (start == end) end <- end + lubridate::days(1)
+  
+  # For when date end is today
+  date_system <- lubridate::floor_date(Sys.time(), "day")
+  date_system <- lubridate::force_tz(date_system, "UTC")
+  
+  # Push
+  if (date_system == end) end <- end + lubridate::days(1)
   
   # Create mapping data frame, quite a bit of work and there still is overlap
   df <- data.frame(date = seq(start, end, interval)) %>% 
@@ -175,10 +183,10 @@ build_query_urls <- function(user, key, server, station, start, end, interval) {
 # Function to get read json return and format into a data frame 
 #
 # No export
-get_data_worker <- function(url, tz, query_print) {
+get_data_worker <- function(url, tz, print_query) {
   
   # Message query string
-  if (query_print) message(url)
+  if (print_query) message(url)
   
   # Get station from url
   station <- str_split_fixed(url, "/", 13)[, 11]

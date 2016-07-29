@@ -6,7 +6,7 @@
 \usage{
 get_envirologger_data(user, key, server, station, start = NA, end = NA,
   tz = "UTC", remove_duplicates = TRUE, interval = "3 hour",
-  progress = "time", query_print = FALSE)
+  progress = "time", print_query = FALSE)
 }
 \arguments{
 \item{user}{An Envirologger API user-name.}
@@ -41,7 +41,7 @@ each iteration? Default is \code{"3 hour"}.}
 
 \item{progress}{Type of progress bar to display. Default is \code{"time"}.}
 
-\item{query_print}{Should the API query strings be printed? Default is 
+\item{print_query}{Should the API query strings be printed? Default is 
 \code{FALSE}.}
 }
 \value{
