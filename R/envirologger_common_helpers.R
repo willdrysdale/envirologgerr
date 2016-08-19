@@ -38,9 +38,8 @@ parse_date_arguments <- function (date, type, tz = "UTC") {
       date <- ifelse(is.na(date), as.character(lubridate::ceiling_date(date_system, 
                                                                        "year")), date)
     }
-    date <- lubridate::parse_date_time(
-      date, c("ymd", "ymd_h", "ymd_hm", "ymd_hms", "dmy", "dmy_h", "dmy_hm", "dmy_hms"), 
-                                       tz = tz)
+    # Parse date
+    date <- lubridate::parse_date_time(date, c("ymd", "dmy"), tz = tz)
   }
   date
 }
