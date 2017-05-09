@@ -13,10 +13,9 @@ clean_envirologger_data(df)
 \code{clean_envirologger_data} creates a variable variable/column with help
 of a look-up table and treats statuses as observations.
 }
-\author{
-Stuart K. Grange
-}
 \seealso{
 \code{\link{get_envirologger_data}}
 }
-
+\author{
+Stuart K. Grange
+}

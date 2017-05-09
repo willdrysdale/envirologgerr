@@ -25,10 +25,9 @@ data_test <- read_envirologger_xml("bt_tower_data.xml")
 }
 
 }
-\author{
-Stuart K. Grange
-}
 \seealso{
 \code{\link{read_envirologger_json}}
 }
-
+\author{
+Stuart K. Grange
+}

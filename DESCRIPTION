@@ -2,11 +2,12 @@ Package: envirologgerr
 Type: Package
 Title: An R interface to the Envirologger API
 Version: 0.0.17
-Date: 2016-08-19
+Date: 2017-05-09
 Authors@R: person("Stuart", "Grange", email = "s.k.grange@gmail.com", 
     role = c("cre", "aut"))
 Description: An R package to make it easy to interface with the Envirologger 
     API
+URL: https://github.com/skgrange/envirologgerr
 License: GPL (>= 2)
 ByteCompile: true
 Imports:
@@ -15,7 +16,8 @@ Imports:
     plyr,
     dplyr,
     jsonlite,
-    XML
+    XML,
+    magrittr
 Suggests:
     openair
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1

@@ -28,4 +28,3 @@ get_envirologger_units(user, key)
 \author{
 Stuart K. Grange
 }
-

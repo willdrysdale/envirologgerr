@@ -65,5 +65,6 @@ airdensity,Air Density,Kg/m3,air_density,,
 wetbulbtemp,Wet Bulb Temp,C,temp_wet_bulb,,
 absolutehum,Absolute Humidity,mm,absolute_humidity,,wrong unit?
 pm10fdmst3,PM10 Cap Temp,ug/m3,pm10_cap_temp,,wrong unit?
-o3sf,Ozone Sample Flow,,o3_sample_flow,ml/min,
-o3ct,Ozone Cell Temp,,o3_cell_temp,C,
+o3sf,Ozone Sample Flow,ml/min,o3_sample_flow,,
+o3ct,Ozone Cell Temp,C,o3_cell_temp,,
+o3si,Ozone Lamp Intensity,C,o3_lamp_intensity,,

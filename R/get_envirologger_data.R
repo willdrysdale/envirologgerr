@@ -57,8 +57,7 @@
 #' 
 #' }
 #' 
-#' @import dplyr
-#' @import stringr
+#' @importFrom magrittr %>%
 #' @importFrom jsonlite fromJSON
 #' 
 #' @export
@@ -81,18 +80,18 @@ get_envirologger_data <- function(user, key, server, station, start = NA,
     names(df) <- ifelse(names(df) == "pre_scaled", "value", names(df))
     
     # Lower case and trim
-    df$label <- str_to_lower(df$label)
-    df$label <- str_trim(df$label)
+    df$label <- stringr::str_to_lower(df$label)
+    df$label <- stringr::str_trim(df$label)
     
     # Remove true value duplicates
     if (remove_duplicates) {
       
       df <- df %>% 
-        distinct(date,
-                 station,
-                 channel_number,
-                 value,
-                 .keep_all = TRUE)
+        dplyr::distinct(date,
+                        station,
+                        channel_number,
+                        value,
+                        .keep_all = TRUE)
       
     }
     
@@ -126,7 +125,7 @@ build_query_urls <- function(user, key, server, station, start, end, interval) {
   if (start == end) end <- end + lubridate::days(1)
   
   # For when date end is today
-  date_system <- lubridate::floor_date(Sys.time(), "day")
+  date_system <- lubridate::floor_date(lubridate::now(), "day")
   date_system <- lubridate::force_tz(date_system, "UTC")
   
   # Push
@@ -134,18 +133,18 @@ build_query_urls <- function(user, key, server, station, start, end, interval) {
   
   # Create mapping data frame, quite a bit of work and there still is overlap
   df <- data.frame(date = seq(start, end, interval)) %>% 
-    mutate(date_end = lead(date),
-           date_end_lag = lag(date_end),
-           date_end_lag = ifelse(is.na(date_end_lag), date_end, date_end_lag),
-           date = ifelse(is.na(date), date_end, date),
-           date = ifelse(date == date_end_lag, date + 60, date),
-           date = as.POSIXct(date, tz = "UTC", origin = "1970-01-01"),
-           date = str_replace_all(date, "-|:| ", ""), 
-           date_end = str_replace_all(date_end, "-|:| ", ""),
-           date = str_sub(date, end = 10), 
-           date_end = str_sub(date_end, end = 10)) %>% 
-    filter(!is.na(date_end)) %>% 
-    select(-date_end_lag)
+    dplyr::mutate(date_end = dplyr::lead(date),
+                  date_end_lag = dplyr::lag(date_end),
+                  date_end_lag = ifelse(is.na(date_end_lag), date_end, date_end_lag),
+                  date = ifelse(is.na(date), date_end, date),
+                  date = ifelse(date == date_end_lag, date + 60, date),
+                  date = as.POSIXct(date, tz = "UTC", origin = "1970-01-01"),
+                  date = stringr::str_replace_all(date, "-|:| ", ""), 
+                  date_end = stringr::str_replace_all(date_end, "-|:| ", ""),
+                  date = stringr::str_sub(date, end = 10), 
+                  date_end = stringr::str_sub(date_end, end = 10)) %>% 
+    dplyr::filter(!is.na(date_end)) %>% 
+    dplyr::select(-date_end_lag)
   # Could use end = 12, but issues arrise, first query is ignored. API behaviour? 
   
   # Vectorise over site too
@@ -163,16 +162,16 @@ build_query_urls <- function(user, key, server, station, start, end, interval) {
     df$station <- station
     
     # Arrange by station
-    df <- arrange(df, station)
+    df <- dplyr::arrange(df, station)
     
   }
   
   # Build query strings
-  url <- str_c("stationdata/bydate/", server, "/", df$station, "/", 
-               df$date, "/", df$date_end)
+  url <- stringr::str_c("stationdata/bydate/", server, "/", df$station, "/", 
+                        df$date, "/", df$date_end)
   
   # Add base of url 
-  url <- str_c(base_envirologger_url(user, key), url)
+  url <- stringr::str_c(base_envirologger_url(user, key), url)
   
   # Return
   url
@@ -189,7 +188,7 @@ get_data_worker <- function(url, tz, print_query) {
   if (print_query) message(url)
   
   # Get station from url
-  station <- str_split_fixed(url, "/", 13)[, 11]
+  station <- stringr::str_split_fixed(url, "/", 13)[, 11]
   station <- as.integer(station)
   
   # Get response
@@ -248,7 +247,7 @@ get_data_worker <- function(url, tz, print_query) {
       df <- mapply(cbind, df, "date" = date, SIMPLIFY = FALSE)
       
       # Create data frame
-      df <- bind_rows(df)
+      df <- dplyr::bind_rows(df)
       
       # Add station key
       df$station <- station

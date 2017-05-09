@@ -64,11 +64,10 @@ data_air <- get_envirologger_data(user, key, 100, 1000, start = "2016-06-20",
 }
 
 }
-\author{
-Stuart K. Grange
-}
 \seealso{
 \href{http://api.envirologger.net/2.0/documentation}{API Documentation},
 \code{\link{get_envirologger_stations}}
 }
-
+\author{
+Stuart K. Grange
+}

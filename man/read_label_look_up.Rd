@@ -24,4 +24,3 @@ data_labels <- read_label_look_up()
 \author{
 Stuart K. Grange
 }
-

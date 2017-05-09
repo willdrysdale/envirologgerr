@@ -25,11 +25,10 @@ get_envirologger_stations(user, key)
 }
 
 }
-\author{
-Stuart K. Grange
-}
 \seealso{
 \href{http://api.envirologger.net/2.0/documentation}{API Documentation},
 \code{\link{get_envirologger_data}}
 }
-
+\author{
+Stuart K. Grange
+}
