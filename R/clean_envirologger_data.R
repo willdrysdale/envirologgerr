@@ -9,8 +9,6 @@
 #' 
 #' @author Stuart K. Grange
 #' 
-#' @importFrom magrittr %>%
-#' 
 #' @export
 clean_envirologger_data <- function(df) {
   

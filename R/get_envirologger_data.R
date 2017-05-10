@@ -57,7 +57,6 @@
 #' 
 #' }
 #' 
-#' @importFrom magrittr %>%
 #' @importFrom jsonlite fromJSON
 #' 
 #' @export
