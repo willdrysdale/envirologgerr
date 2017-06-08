@@ -69,8 +69,13 @@ get_envirologger_data <- function(user, key, server, station, start = NA,
   urls <- build_query_urls(user, key, server, station, start, end, interval)
   
   # Get data
-  df <- plyr::ldply(urls, get_data_worker, tz = tz, print_query = print_query, 
-                    .progress = progress)
+  df <- plyr::ldply(
+    urls, 
+    get_envirologger_data_worker, 
+    tz = tz, 
+    print_query = print_query, 
+    .progress = progress
+  )
   
   if (!nrow(df) == 0) {
     
@@ -125,7 +130,7 @@ build_query_urls <- function(user, key, server, station, start, end, interval) {
   
   # For when date end is today
   date_system <- lubridate::floor_date(lubridate::now(), "day")
-  date_system <- lubridate::force_tz(date_system, "UTC")
+  date_system <- lubridate::force_tz(date_system, tz = "UTC")
   
   # Push
   if (date_system == end) end <- end + lubridate::days(1)
@@ -166,14 +171,18 @@ build_query_urls <- function(user, key, server, station, start, end, interval) {
   }
   
   # Build query strings
-  url <- stringr::str_c("stationdata/bydate/", server, "/", df$station, "/", 
-                        df$date, "/", df$date_end)
+  url <- stringr::str_c(
+    "stationdata/bydate/", 
+    server, "/", 
+    df$station, "/", 
+    df$date, "/", 
+    df$date_end
+  )
   
   # Add base of url 
   url <- stringr::str_c(base_envirologger_url(user, key), url)
   
-  # Return
-  url
+  return(url)
   
 }
 
@@ -181,14 +190,14 @@ build_query_urls <- function(user, key, server, station, start, end, interval) {
 # Function to get read json return and format into a data frame 
 #
 # No export
-get_data_worker <- function(url, tz, print_query) {
+get_envirologger_data_worker <- function(url, tz, print_query) {
   
   # Message query string
   if (print_query) message(url)
   
   # Get station from url
   station <- stringr::str_split_fixed(url, "/", 13)[, 11]
-  station <- as.integer(station)
+  station <- as.numeric(station)
   
   # Get response
   response <- tryCatch({
@@ -214,6 +223,17 @@ get_data_worker <- function(url, tz, print_query) {
     
   })
   
+  # Check for discontinued string
+  if (grepl("discontinued", response, ignore.case = TRUE)) {
+    
+    # For the user
+    warning("API is reporting that it has been discontinued.", call. = FALSE)
+    
+    # Keep logic the same
+    response <- NULL
+    
+  }
+  
   # If we get a return, make a nice data frame
   if (!is.null(response)) {
     
@@ -225,7 +245,6 @@ get_data_worker <- function(url, tz, print_query) {
       
     }, error = function(e) {
       
-      # Return
       NULL
       
     })
@@ -260,7 +279,6 @@ get_data_worker <- function(url, tz, print_query) {
     
   }
   
-  # Return
-  df
+  return(df)
   
 }
