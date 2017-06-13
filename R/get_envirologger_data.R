@@ -37,6 +37,8 @@
 #' @param print_query Should the API query strings be printed? Default is 
 #' \code{FALSE}. 
 #' 
+#' @param progress Type of progress bar to be displayed. 
+#' 
 #' @return Data frame with correct data types. 
 #' 
 #' @seealso \href{http://api.envirologger.net/2.0/documentation}{API Documentation},
@@ -62,23 +64,20 @@
 #' @export
 get_envirologger_data <- function(user, key, station, start = NA, 
                                   end = NA, tz = "UTC", remove_duplicates = TRUE, 
-                                  interval = "3 hour", print_query = FALSE) {
+                                  interval = "3 hour", print_query = FALSE, 
+                                  progress = "time") {
   
   # Build query strings for api
   urls <- build_query_urls(user, key, server, station, start, end, interval)
   
   # Get data
-  df <- data_frame(url = urls) %>% 
-    rowwise() %>% 
-    do(
-      get_envirologger_data_worker(
-        url = .$url, 
-        tz = tz, 
-        print_query = print_query
-      )
-    ) %>% 
-    ungroup() %>% 
-    data.frame()
+  df <- plyr::ldply(
+    urls, 
+    get_envirologger_data_worker, 
+    tz = tz, 
+    print_query = print_query, 
+    .progress = progress
+  )
   
   if (!nrow(df) == 0) {
     

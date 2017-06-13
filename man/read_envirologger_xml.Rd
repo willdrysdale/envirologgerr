@@ -11,6 +11,9 @@ read_envirologger_xml(file, tz = "UTC")
 
 \item{tz}{Time-zone of dates within \code{file}. Default is \code{"UTC"}.}
 }
+\value{
+Data frame.
+}
 \description{
 \code{read_envirologger_xml} is not fast and is not suitable for large XML 
 documents.

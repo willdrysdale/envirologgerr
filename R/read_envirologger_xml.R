@@ -6,6 +6,7 @@
 #' @seealso \code{\link{read_envirologger_json}}
 #' 
 #' @param file File name of Envirologger XML file. 
+#' 
 #' @param tz Time-zone of dates within \code{file}. Default is \code{"UTC"}. 
 #' 
 #' @examples 
@@ -18,6 +19,8 @@
 #' }
 #' 
 #' @author Stuart K. Grange
+#' 
+#' @return Data frame.
 #' 
 #' @export
 read_envirologger_xml <- function(file, tz = "UTC") {
