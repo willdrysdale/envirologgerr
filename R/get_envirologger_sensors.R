@@ -1,4 +1,4 @@
-#' Function to get available Envirologger API monitoring stations for a user. 
+#' Function to get available Envirologger API monitoring sensors.  
 #' 
 #' @author Stuart K. Grange
 #' 
@@ -9,23 +9,23 @@
 #' @return Data frame with correct data types. 
 #' 
 #' @seealso \href{https://api.airmonitors.net/3.0/documentation}{API Documentation},
-#' \code{\link{get_envirologger_data}}
+#' \code{\link{get_envirologger_data}}, \code{\link{get_envirologger_sensors}}
 #' 
 #' @examples 
 #' \dontrun{
 #' 
-#' get_envirologger_stations(user, key)
+#' get_envirologger_sensors(user, key)
 #' 
 #' }
 #' 
 #' @export
-get_envirologger_stations <- function(user, key) {
+get_envirologger_sensors <- function(user, key) {
   
   # Location
   base_url <- base_envirologger_url(user, key)
   
   # Build query
-  query <- stringr::str_c(base_url, "stations")
+  query <- stringr::str_c(base_url, "sensors")
   
   # Get response
   response <- readLines(query, warn = FALSE)
@@ -38,15 +38,14 @@ get_envirologger_stations <- function(user, key) {
   
   # Clean names
   names(df) <- str_underscore(names(df))
-  names(df) <- ifelse(names(df) == "unique_id", "station", names(df))
   
-  # Data types
-  df$latitude <- as.numeric(df$latitude)
-  df$longitude <- as.numeric(df$longitude)
+  # Lower case and trim the label variable
+  df$label <- stringr::str_to_lower(df$label)
+  df$label <- stringr::str_trim(df$label)
   
   # Arrange
-  df <- arrange(df, station)
-  
+  df <- arrange(df, sensor_id)
+
   return(df)
   
 }

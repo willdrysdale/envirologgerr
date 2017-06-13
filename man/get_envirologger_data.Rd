@@ -4,18 +4,14 @@
 \alias{get_envirologger_data}
 \title{Function to get observational data from Envirologger API.}
 \usage{
-get_envirologger_data(user, key, server, station, start = NA, end = NA,
+get_envirologger_data(user, key, station, start = NA, end = NA,
   tz = "UTC", remove_duplicates = TRUE, interval = "3 hour",
-  progress = "time", print_query = FALSE)
+  print_query = FALSE)
 }
 \arguments{
 \item{user}{An Envirologger API user-name.}
 
 \item{key}{An Envirologger API key for \code{user}.}
-
-\item{server}{An Envirologger API server code to use for download. Server 
-codes are integers and \code{\link{get_envirologger_stations}} can be used to 
-find these codes.}
 
 \item{station}{A vector of station codes to download. Station codes are 
 integers and \code{\link{get_envirologger_stations}} can be used to find 
@@ -39,8 +35,6 @@ be removed? Default is \code{TRUE} as this is common.}
 \item{interval}{How much data should the function request from the API for 
 each iteration? Default is \code{"3 hour"}.}
 
-\item{progress}{Type of progress bar to display. Default is \code{"time"}.}
-
 \item{print_query}{Should the API query strings be printed? Default is 
 \code{FALSE}.}
 }
@@ -58,8 +52,14 @@ begins to raise error codes and can hang.
 \dontrun{
 
 # Get some data for a made up station
-data_air <- get_envirologger_data(user, key, 100, 1000, start = "2016-06-20", 
-                                  end = "2016-06-21")
+data_air <- get_envirologger_data(
+  user, 
+  key, 
+  100, 
+  1000,
+  start = "2016-06-20", 
+  end = "2016-06-21"
+)
 
 }
 

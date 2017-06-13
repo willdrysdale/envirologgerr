@@ -12,10 +12,6 @@
 #' 
 #' @param key An Envirologger API key for \code{user}. 
 #' 
-#' @param server An Envirologger API server code to use for download. Server 
-#' codes are integers and \code{\link{get_envirologger_stations}} can be used to 
-#' find these codes. 
-#' 
 #' @param station A vector of station codes to download. Station codes are 
 #' integers and \code{\link{get_envirologger_stations}} can be used to find 
 #' these codes. 
@@ -38,8 +34,6 @@
 #' @param interval How much data should the function request from the API for 
 #' each iteration? Default is \code{"3 hour"}. 
 #' 
-#' @param progress Type of progress bar to display. Default is \code{"time"}. 
-#' 
 #' @param print_query Should the API query strings be printed? Default is 
 #' \code{FALSE}. 
 #' 
@@ -52,30 +46,39 @@
 #' \dontrun{
 #' 
 #' # Get some data for a made up station
-#' data_air <- get_envirologger_data(user, key, 100, 1000, start = "2016-06-20", 
-#'                                   end = "2016-06-21")
+#' data_air <- get_envirologger_data(
+#'   user, 
+#'   key, 
+#'   100, 
+#'   1000,
+#'   start = "2016-06-20", 
+#'   end = "2016-06-21"
+#' )
 #' 
 #' }
 #' 
 #' @importFrom jsonlite fromJSON
 #' 
 #' @export
-get_envirologger_data <- function(user, key, server, station, start = NA, 
+get_envirologger_data <- function(user, key, station, start = NA, 
                                   end = NA, tz = "UTC", remove_duplicates = TRUE, 
-                                  interval = "3 hour", progress = "time",
-                                  print_query = FALSE) {
+                                  interval = "3 hour", print_query = FALSE) {
   
   # Build query strings for api
   urls <- build_query_urls(user, key, server, station, start, end, interval)
   
   # Get data
-  df <- plyr::ldply(
-    urls, 
-    get_envirologger_data_worker, 
-    tz = tz, 
-    print_query = print_query, 
-    .progress = progress
-  )
+  df <- data_frame(url = urls) %>% 
+    rowwise() %>% 
+    do(
+      get_envirologger_data_worker(
+        url = .$url, 
+        tz = tz, 
+        print_query = print_query
+      )
+    ) %>% 
+    ungroup() %>% 
+    data.frame()
   
   if (!nrow(df) == 0) {
     
@@ -83,24 +86,23 @@ get_envirologger_data <- function(user, key, server, station, start = NA,
     names(df) <- str_underscore(names(df))
     names(df) <- ifelse(names(df) == "pre_scaled", "value", names(df))
     
-    # Lower case and trim
-    df$label <- stringr::str_to_lower(df$label)
-    df$label <- stringr::str_trim(df$label)
-    
     # Remove true value duplicates
     if (remove_duplicates) {
       
       df <- df %>% 
-        dplyr::distinct(date,
-                        station,
-                        channel_number,
-                        value,
-                        .keep_all = TRUE)
+        distinct(date,
+                 station,
+                 channel_number,
+                 value,
+                 .keep_all = TRUE)
       
     }
     
-    # Arrange
-    df <- arrange_left(df, c("date", "station", "label", "sensor", "value"))
+    # Arrange variables
+    df <- arrange_left(df, c("date", "station", "sensor_id", "value"))
+    
+    # Arrange variables
+    df <- arrange(df, station, channel_number)
     
   } else {
     
@@ -109,8 +111,7 @@ get_envirologger_data <- function(user, key, server, station, start = NA,
     
   }
   
-  # Return
-  df
+  return(df)
   
 }
 
@@ -137,18 +138,18 @@ build_query_urls <- function(user, key, server, station, start, end, interval) {
   
   # Create mapping data frame, quite a bit of work and there still is overlap
   df <- data.frame(date = seq(start, end, interval)) %>% 
-    dplyr::mutate(date_end = dplyr::lead(date),
-                  date_end_lag = dplyr::lag(date_end),
-                  date_end_lag = ifelse(is.na(date_end_lag), date_end, date_end_lag),
-                  date = ifelse(is.na(date), date_end, date),
-                  date = ifelse(date == date_end_lag, date + 60, date),
-                  date = as.POSIXct(date, tz = "UTC", origin = "1970-01-01"),
-                  date = stringr::str_replace_all(date, "-|:| ", ""), 
-                  date_end = stringr::str_replace_all(date_end, "-|:| ", ""),
-                  date = stringr::str_sub(date, end = 10), 
-                  date_end = stringr::str_sub(date_end, end = 10)) %>% 
-    dplyr::filter(!is.na(date_end)) %>% 
-    dplyr::select(-date_end_lag)
+    mutate(date_end = dplyr::lead(date),
+           date_end_lag = dplyr::lag(date_end),
+           date_end_lag = ifelse(is.na(date_end_lag), date_end, date_end_lag),
+           date = ifelse(is.na(date), date_end, date),
+           date = ifelse(date == date_end_lag, date + 60, date),
+           date = as.POSIXct(date, tz = "UTC", origin = "1970-01-01"),
+           date = stringr::str_replace_all(date, "-|:| ", ""), 
+           date_end = stringr::str_replace_all(date_end, "-|:| ", ""),
+           date = stringr::str_sub(date, end = 10), 
+           date_end = stringr::str_sub(date_end, end = 10)) %>% 
+    filter(!is.na(date_end)) %>% 
+    select(-date_end_lag)
   # Could use end = 12, but issues arrise, first query is ignored. API behaviour? 
   
   # Vectorise over site too
@@ -166,17 +167,16 @@ build_query_urls <- function(user, key, server, station, start, end, interval) {
     df$station <- station
     
     # Arrange by station
-    df <- dplyr::arrange(df, station)
+    df <- arrange(df, station)
     
   }
   
   # Build query strings
   url <- stringr::str_c(
-    "stationdata/bydate/", 
-    server, "/", 
-    df$station, "/", 
+    "stationdata/date/", 
     df$date, "/", 
-    df$date_end
+    df$date_end, "/",
+    df$station
   )
   
   # Add base of url 
@@ -196,7 +196,7 @@ get_envirologger_data_worker <- function(url, tz, print_query) {
   if (print_query) message(url)
   
   # Get station from url
-  station <- stringr::str_split_fixed(url, "/", 13)[, 11]
+  station <- stringr::str_split_fixed(url, "/", 12)[, 12]
   station <- as.numeric(station)
   
   # Get response
@@ -223,14 +223,18 @@ get_envirologger_data_worker <- function(url, tz, print_query) {
     
   })
   
-  # Check for discontinued string
-  if (grepl("discontinued", response, ignore.case = TRUE)) {
+  # Check for discontinued string, null behaves differently in the logic
+  if (!is.null(response)) {
     
-    # For the user
-    warning("API is reporting that it has been discontinued.", call. = FALSE)
-    
-    # Keep logic the same
-    response <- NULL
+    if (grepl("discontinued", response, ignore.case = TRUE)) {
+      
+      # For the user
+      warning("API is reporting that it has been discontinued.", call. = FALSE)
+      
+      # Keep logic the same
+      response <- NULL
+      
+    }
     
   }
   

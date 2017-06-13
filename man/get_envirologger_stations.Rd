@@ -26,7 +26,7 @@ get_envirologger_stations(user, key)
 
 }
 \seealso{
-\href{http://api.envirologger.net/2.0/documentation}{API Documentation},
+\href{https://api.airmonitors.net/3.0/documentation}{API Documentation},
 \code{\link{get_envirologger_data}}
 }
 \author{

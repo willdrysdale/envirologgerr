@@ -36,7 +36,6 @@ get_envirologger_units <- function(user, key) {
   # Clean names
   names(df) <- str_underscore(names(df))
   
-  # Return
-  df
+  return(df)
   
 }
