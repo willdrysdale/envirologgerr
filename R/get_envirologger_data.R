@@ -41,7 +41,7 @@
 #' 
 #' @return Data frame with correct data types. 
 #' 
-#' @seealso \href{http://api.envirologger.net/2.0/documentation}{API Documentation},
+#' @seealso \href{https://api.airmonitors.net/3.0/documentation}{API Documentation},
 #' \code{\link{get_envirologger_stations}}
 #' 
 #' @examples 
@@ -49,10 +49,9 @@
 #' 
 #' # Get some data for a made up station
 #' data_air <- get_envirologger_data(
-#'   user, 
-#'   key, 
-#'   100, 
-#'   1000,
+#'   user = user, 
+#'   key = key, 
+#'   station = 1001, 
 #'   start = "2016-06-20", 
 #'   end = "2016-06-21"
 #' )
@@ -228,7 +227,7 @@ get_envirologger_data_worker <- function(url, tz, print_query) {
     if (grepl("discontinued", response, ignore.case = TRUE)) {
       
       # For the user
-      warning("API is reporting that it has been discontinued.", call. = FALSE)
+      warning("API is reporting that it has been discontinued...", call. = FALSE)
       
       # Keep logic the same
       response <- NULL

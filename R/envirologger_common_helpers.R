@@ -12,10 +12,10 @@ response_check <- function(x) {
   
   # Check
   if (grepl("authentication failed", x, ignore.case = TRUE))
-    stop("API authentication failed.", call. = FALSE)
+    stop("API authentication failed...", call. = FALSE)
   
   if (grepl("no data", x, ignore.case = TRUE))
-    stop("No data found by API.", call. = FALSE)
+    stop("No data found by API...", call. = FALSE)
     
 }
 
@@ -53,7 +53,7 @@ str_underscore <- function(x) {
   x <- gsub("__", "_", x)
   x <- gsub("([a-z])([A-Z])", "\\1_\\2", x)
   x <- tolower(x)
-  x
+  return(x)
 }
 
 
@@ -63,7 +63,7 @@ arrange_left <- function (df, variable) {
   index <- index[lapply(index, length) > 0]
   index <- unlist(index)
   df <- df[, c(c(index), (1:ncol(df))[-index])]
-  df
+  return(df)
 }
 
 
@@ -73,5 +73,5 @@ replicate_rows <- function (df, n, reset = TRUE) {
   df <- df[rep(seq_len(nrow(df)), each = n), ]
   if (reset) 
     row.names(df) <- NULL
-  df
+  return(df)
 }

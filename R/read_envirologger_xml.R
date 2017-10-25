@@ -45,8 +45,7 @@ read_envirologger_xml <- function(file, tz = "UTC") {
   # Clean
   df <- clean_envirologger_observations(df, serial_number, site, tz)
   
-  # Return
-  df
+  return(df)
   
 }
 
@@ -91,8 +90,7 @@ read_envirologger_json <- function(file, tz = "UTC") {
   # Clean
   df <- clean_envirologger_observations(df, serial_number, site, tz)
   
-  # Return
-  df
+  return(df)
   
 }
 
@@ -118,7 +116,6 @@ clean_envirologger_observations <- function(df, serial_number, site, tz) {
   # NA catch
   df[, -1] <- lapply(df[, -1], function(x) ifelse(x == -999, NA, x))
   
-  # Return
-  df
+  return(df)
   
 }
