@@ -58,8 +58,6 @@
 #' 
 #' }
 #' 
-#' @importFrom jsonlite fromJSON
-#' 
 #' @export
 get_envirologger_data <- function(user, key, station, start = NA, 
                                   end = NA, tz = "UTC", remove_duplicates = TRUE, 
@@ -191,7 +189,7 @@ build_query_urls <- function(user, key, server, station, start, end, interval) {
 get_envirologger_data_worker <- function(url, tz, print_query) {
   
   # Message query string
-  if (print_query) message(url)
+  if (print_query) message(stringr::str_c("\n", url))
   
   # Get station from url
   station <- stringr::str_split_fixed(url, "/", 12)[, 12]
@@ -224,7 +222,7 @@ get_envirologger_data_worker <- function(url, tz, print_query) {
   # Check for discontinued string, null behaves differently in the logic
   if (!is.null(response)) {
     
-    if (grepl("discontinued", response, ignore.case = TRUE)) {
+    if (any(grepl("discontinued", response, ignore.case = TRUE))) {
       
       # For the user
       warning("API is reporting that it has been discontinued...", call. = FALSE)
@@ -243,7 +241,7 @@ get_envirologger_data_worker <- function(url, tz, print_query) {
     response <- tryCatch({
       
       # Parse
-      fromJSON(response)
+      jsonlite::fromJSON(response)
       
     }, error = function(e) {
       
