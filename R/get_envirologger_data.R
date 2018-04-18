@@ -94,8 +94,8 @@ get_envirologger_data <- function(user, key, station, start = NA,
       
     }
     
-    # Arrange variables
-    df <- arrange_left(df, c("date", "station", "sensor_id", "value"))
+    # Arrange variable order
+    df <- select(df, date, station, sensor_id, value, everything())
     
     # Arrange variables
     df <- arrange(df, station, channel_number)

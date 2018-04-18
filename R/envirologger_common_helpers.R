@@ -57,16 +57,6 @@ str_underscore <- function(x) {
 }
 
 
-arrange_left <- function (df, variable) {
-  variable <- stringr::str_c("\\b", variable, "\\b")
-  index <- lapply(variable, function(x) grep(x, names(df)))
-  index <- index[lapply(index, length) > 0]
-  index <- unlist(index)
-  df <- df[, c(c(index), (1:ncol(df))[-index])]
-  return(df)
-}
-
-
 replicate_rows <- function (df, n, reset = TRUE) {
   if (reset) 
     row.names(df) <- NULL
