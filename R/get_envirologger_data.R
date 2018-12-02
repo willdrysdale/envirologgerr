@@ -69,7 +69,9 @@ get_envirologger_data <- function(user, key, station, start = NA,
     urls, 
     get_envirologger_data_worker, 
     tz = tz, 
-    verbose = verbose
+    verbose = verbose,
+    user = user,
+    key = key
   )
   
   if (!nrow(df) == 0) {
@@ -188,9 +190,16 @@ build_query_urls <- function(user, key, server, station, start, end, interval) {
 # Function to get read json return and format into a data frame 
 #
 # No export
-get_envirologger_data_worker <- function(url, tz, verbose) {
+get_envirologger_data_worker <- function(url, tz, user, key, verbose) {
   
-  if (verbose) message(message_date_prefix(), url, "...")
+  if (verbose) {
+    
+    message_url <- stringr::str_replace(url, user, "{user}")
+    message_url <- stringr::str_replace(message_url, key, "{key}")
+    
+    message(message_date_prefix(), message_url, "...")
+    
+  }
   
   # Get station from url
   station <- stringr::str_split_fixed(url, "/", 12)[, 12]
