@@ -6,7 +6,7 @@
 #' 
 #' @param key An Envirologger API key for \code{user}. 
 #' 
-#' @return Data frame with correct data types. 
+#' @return Tibble. 
 #' 
 #' @seealso \href{https://api.airmonitors.net/3.0/documentation}{API Documentation},
 #' \code{\link{get_envirologger_data}}
@@ -45,7 +45,9 @@ get_envirologger_stations <- function(user, key) {
   df$longitude <- as.numeric(df$longitude)
   
   # Arrange
-  df <- arrange(df, station)
+  df <- df %>% 
+    arrange(station) %>% 
+    as_tibble()
   
   return(df)
   

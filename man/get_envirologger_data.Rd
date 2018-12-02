@@ -6,7 +6,7 @@
 \usage{
 get_envirologger_data(user, key, station, start = NA, end = NA,
   tz = "UTC", remove_duplicates = TRUE, interval = "3 hour",
-  print_query = FALSE, progress = "time")
+  verbose = FALSE)
 }
 \arguments{
 \item{user}{An Envirologger API user-name.}
@@ -35,13 +35,10 @@ be removed? Default is \code{TRUE} as this is common.}
 \item{interval}{How much data should the function request from the API for 
 each iteration? Default is \code{"3 hour"}.}
 
-\item{print_query}{Should the API query strings be printed? Default is 
-\code{FALSE}.}
-
-\item{progress}{Type of progress bar to be displayed.}
+\item{verbose}{Should the functions give messages?}
 }
 \value{
-Data frame with correct data types.
+Tibble.
 }
 \description{
 The Envirologger API is not fast and will take about a minute to download a
@@ -51,6 +48,7 @@ amount of data requested is too high, the interface is unreliable as the API
 begins to raise error codes and can hang.
 }
 \examples{
+
 \dontrun{
 
 # Get some data for a made up station

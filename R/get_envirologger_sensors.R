@@ -6,7 +6,7 @@
 #' 
 #' @param key An Envirologger API key for \code{user}. 
 #' 
-#' @return Data frame with correct data types. 
+#' @return Tibble. 
 #' 
 #' @seealso \href{https://api.airmonitors.net/3.0/documentation}{API Documentation},
 #' \code{\link{get_envirologger_data}}, \code{\link{get_envirologger_sensors}}
@@ -44,7 +44,9 @@ get_envirologger_sensors <- function(user, key) {
   df$label <- stringr::str_trim(df$label)
   
   # Arrange
-  df <- arrange(df, sensor_id)
+  df <- df %>% 
+    arrange(sensor_id) %>% 
+    as_tibble()
 
   return(df)
   

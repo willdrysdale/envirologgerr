@@ -40,7 +40,7 @@ read_envirologger_xml <- function(file, tz = "UTC") {
   
   # Make a data frame
   df <- lapply(df, data.frame)
-  df <- plyr::rbind.fill(df)
+  df <- purrr::map_dfr(df)
   
   # Clean
   df <- clean_envirologger_observations(df, serial_number, site, tz)

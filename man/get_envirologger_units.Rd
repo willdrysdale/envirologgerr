@@ -12,7 +12,7 @@ get_envirologger_units(user, key)
 \item{key}{An Envirologger API key for \code{user}.}
 }
 \value{
-Data frame.
+Tibble.
 }
 \description{
 Function to get units data from Envirologger API.

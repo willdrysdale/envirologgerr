@@ -6,7 +6,7 @@
 #' 
 #' @param key An Envirologger API key for \code{user}. 
 #' 
-#' @return Data frame.
+#' @return Tibble. 
 #' 
 #' @examples 
 #' \dontrun{
@@ -35,6 +35,8 @@ get_envirologger_units <- function(user, key) {
   
   # Clean names
   names(df) <- str_underscore(names(df))
+  
+  df <- as_tibble(df)
   
   return(df)
   

@@ -34,17 +34,15 @@
 #' @param interval How much data should the function request from the API for 
 #' each iteration? Default is \code{"3 hour"}. 
 #' 
-#' @param print_query Should the API query strings be printed? Default is 
-#' \code{FALSE}. 
+#' @param verbose Should the functions give messages? 
 #' 
-#' @param progress Type of progress bar to be displayed. 
-#' 
-#' @return Data frame with correct data types. 
+#' @return Tibble. 
 #' 
 #' @seealso \href{https://api.airmonitors.net/3.0/documentation}{API Documentation},
 #' \code{\link{get_envirologger_stations}}
 #' 
 #' @examples 
+#' 
 #' \dontrun{
 #' 
 #' # Get some data for a made up station
@@ -61,19 +59,17 @@
 #' @export
 get_envirologger_data <- function(user, key, station, start = NA, 
                                   end = NA, tz = "UTC", remove_duplicates = TRUE, 
-                                  interval = "3 hour", print_query = FALSE, 
-                                  progress = "time") {
+                                  interval = "3 hour", verbose = FALSE) {
   
   # Build query strings for api
   urls <- build_query_urls(user, key, server, station, start, end, interval)
   
   # Get data
-  df <- plyr::ldply(
+  df <- purrr::map_dfr(
     urls, 
     get_envirologger_data_worker, 
     tz = tz, 
-    print_query = print_query, 
-    .progress = progress
+    verbose = verbose
   )
   
   if (!nrow(df) == 0) {
@@ -94,16 +90,21 @@ get_envirologger_data <- function(user, key, station, start = NA,
       
     }
     
-    # Arrange variable order
-    df <- select(df, date, station, sensor_id, value, everything())
-    
-    # Arrange variables
-    df <- arrange(df, station, channel_number)
+    # Arrange variable order and arrange observations
+    df <- df %>% 
+      select(date, 
+             station, 
+             sensor_id, 
+             value, 
+             everything()) %>% 
+      arrange(station, 
+              channel_number) %>% 
+      as_tibble()
     
   } else {
     
     # No data to return
-    df <- data.frame()
+    df <- data_frame()
     
   }
   
@@ -133,19 +134,20 @@ build_query_urls <- function(user, key, server, station, start, end, interval) {
   if (date_system == end) end <- end + lubridate::days(1)
   
   # Create mapping data frame, quite a bit of work and there still is overlap
-  df <- data.frame(date = seq(start, end, interval)) %>% 
+  df <- data_frame(date = seq(start, end, interval)) %>% 
     mutate(date_end = dplyr::lead(date),
            date_end_lag = dplyr::lag(date_end),
            date_end_lag = ifelse(is.na(date_end_lag), date_end, date_end_lag),
            date = ifelse(is.na(date), date_end, date),
            date = ifelse(date == date_end_lag, date + 60, date),
            date = as.POSIXct(date, tz = "UTC", origin = "1970-01-01"),
-           date = stringr::str_replace_all(date, "-|:| ", ""), 
-           date_end = stringr::str_replace_all(date_end, "-|:| ", ""),
+           date = stringr::str_remove_all(date, "-|:| "), 
+           date_end = stringr::str_remove_all(date_end, "-|:| "),
            date = stringr::str_sub(date, end = 10), 
            date_end = stringr::str_sub(date_end, end = 10)) %>% 
     filter(!is.na(date_end)) %>% 
     select(-date_end_lag)
+  
   # Could use end = 12, but issues arrise, first query is ignored. API behaviour? 
   
   # Vectorise over site too
@@ -186,10 +188,9 @@ build_query_urls <- function(user, key, server, station, start, end, interval) {
 # Function to get read json return and format into a data frame 
 #
 # No export
-get_envirologger_data_worker <- function(url, tz, print_query) {
+get_envirologger_data_worker <- function(url, tz, verbose) {
   
-  # Message query string
-  if (print_query) message(stringr::str_c("\n", url))
+  if (verbose) message(message_date_prefix(), url, "...")
   
   # Get station from url
   station <- stringr::str_split_fixed(url, "/", 12)[, 12]
@@ -274,8 +275,10 @@ get_envirologger_data_worker <- function(url, tz, print_query) {
     
   } else {
     
+    message(message_date_prefix(), "No data returned...")
+    
     # Return empty data frame, reassign tryCatch return
-    df <- data.frame()
+    df <- data_frame()
     
   }
   

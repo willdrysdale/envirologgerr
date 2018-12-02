@@ -12,7 +12,7 @@ get_envirologger_sensors(user, key)
 \item{key}{An Envirologger API key for \code{user}.}
 }
 \value{
-Data frame with correct data types.
+Tibble.
 }
 \description{
 Function to get available Envirologger API monitoring sensors.
