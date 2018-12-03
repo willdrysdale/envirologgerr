@@ -1,11 +1,5 @@
 #' Function to get observational data from Envirologger API. 
 #' 
-#' The Envirologger API is not fast and will take about a minute to download a
-#' day's worth of one-minute data. By default, this function only queries three-
-#' hours worth of data at a time to keep queries manageable for the API. If the
-#' amount of data requested is too high, the interface is unreliable as the API
-#' begins to raise error codes and can hang. 
-#' 
 #' @author Stuart K. Grange
 #' 
 #' @param user An Envirologger API user-name. 
@@ -32,7 +26,7 @@
 #' be removed? Default is \code{TRUE} as this is common. 
 #' 
 #' @param interval How much data should the function request from the API for 
-#' each iteration? Default is \code{"3 hour"}. 
+#' each iteration? 
 #' 
 #' @param verbose Should the functions give messages? 
 #' 
@@ -59,7 +53,7 @@
 #' @export
 get_envirologger_data <- function(user, key, station, start = NA, 
                                   end = NA, tz = "UTC", remove_duplicates = TRUE, 
-                                  interval = "3 hour", verbose = FALSE) {
+                                  interval = "24 hour", verbose = FALSE) {
   
   # Build query strings for api
   urls <- build_query_urls(user, key, server, station, start, end, interval)
@@ -69,9 +63,7 @@ get_envirologger_data <- function(user, key, station, start = NA,
     urls, 
     get_envirologger_data_worker, 
     tz = tz, 
-    verbose = verbose,
-    user = user,
-    key = key
+    verbose = verbose
   )
   
   if (!nrow(df) == 0) {
@@ -194,10 +186,8 @@ get_envirologger_data_worker <- function(url, tz, user, key, verbose) {
   
   if (verbose) {
     
-    message_url <- stringr::str_replace(url, user, "{user}")
-    message_url <- stringr::str_replace(message_url, key, "{key}")
-    
-    message(message_date_prefix(), message_url, "...")
+    stringr::str_split_fixed(url, "date/", 2)[, 2] %>% 
+      message(message_date_prefix(), ., "...")
     
   }
   

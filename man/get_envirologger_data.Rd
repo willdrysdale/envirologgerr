@@ -5,7 +5,7 @@
 \title{Function to get observational data from Envirologger API.}
 \usage{
 get_envirologger_data(user, key, station, start = NA, end = NA,
-  tz = "UTC", remove_duplicates = TRUE, interval = "3 hour",
+  tz = "UTC", remove_duplicates = TRUE, interval = "24 hour",
   verbose = FALSE)
 }
 \arguments{
@@ -33,7 +33,7 @@ will be ceiling-rounded.}
 be removed? Default is \code{TRUE} as this is common.}
 
 \item{interval}{How much data should the function request from the API for 
-each iteration? Default is \code{"3 hour"}.}
+each iteration?}
 
 \item{verbose}{Should the functions give messages?}
 }
@@ -41,11 +41,7 @@ each iteration? Default is \code{"3 hour"}.}
 Tibble.
 }
 \description{
-The Envirologger API is not fast and will take about a minute to download a
-day's worth of one-minute data. By default, this function only queries three-
-hours worth of data at a time to keep queries manageable for the API. If the
-amount of data requested is too high, the interface is unreliable as the API
-begins to raise error codes and can hang.
+Function to get observational data from Envirologger API.
 }
 \examples{
 
