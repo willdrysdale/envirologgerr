@@ -273,9 +273,7 @@ get_envirologger_data_worker <- function(url, tz, user, key, verbose) {
     }
     
   } else {
-    
-    message(message_date_prefix(), "No data returned...")
-    
+  
     # Return empty data frame, reassign tryCatch return
     df <- data_frame()
     
