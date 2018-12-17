@@ -187,7 +187,7 @@ get_envirologger_data_worker <- function(url, tz, user, key, verbose) {
   if (verbose) {
     
     stringr::str_split_fixed(url, "date/", 2)[, 2] %>% 
-      message(message_date_prefix(), ., "...")
+      message(date_message(), ., "...")
     
   }
   
