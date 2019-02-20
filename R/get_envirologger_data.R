@@ -20,7 +20,7 @@
 #' \code{dd/mm/yyyy} will also work. Years as strings or integers work too and 
 #' will be ceiling-rounded. 
 #' 
-#' @param tz Time-zone for the observations' dates. The default is \code{"UTC"}.
+#' @param tz Time zone for the observations' dates. The default is \code{"UTC"}.
 #' 
 #' @param remove_duplicates Should "true" date-station-variable-value duplicates
 #' be removed? Default is \code{TRUE} as this is common. 
@@ -70,7 +70,7 @@ get_envirologger_data <- function(user, key, station, start = NA,
     
     # Clean names
     names(df) <- str_underscore(names(df))
-    names(df) <- ifelse(names(df) == "pre_scaled", "value", names(df))
+    names(df) <- if_else(names(df) == "pre_scaled", "value", names(df))
     
     # Remove true value duplicates
     if (remove_duplicates) {
@@ -92,13 +92,12 @@ get_envirologger_data <- function(user, key, station, start = NA,
              value, 
              everything()) %>% 
       arrange(station, 
-              channel_number) %>% 
-      as_tibble()
+              channel_number)
     
   } else {
     
     # No data to return
-    df <- data_frame()
+    df <- tibble()
     
   }
   
@@ -128,13 +127,12 @@ build_query_urls <- function(user, key, server, station, start, end, interval) {
   if (date_system == end) end <- end + lubridate::days(1)
   
   # Create mapping data frame, quite a bit of work and there still is overlap
-  df <- data_frame(date = seq(start, end, interval)) %>% 
+  df <- tibble(date = seq(start, end, interval)) %>% 
     mutate(date_end = dplyr::lead(date),
            date_end_lag = dplyr::lag(date_end),
-           date_end_lag = ifelse(is.na(date_end_lag), date_end, date_end_lag),
-           date = ifelse(is.na(date), date_end, date),
-           date = ifelse(date == date_end_lag, date + 60, date),
-           date = as.POSIXct(date, tz = "UTC", origin = "1970-01-01"),
+           date_end_lag = if_else(is.na(date_end_lag), date_end, date_end_lag),
+           date = if_else(is.na(date), date_end, date),
+           date = if_else(date == date_end_lag, date + 60, date),
            date = stringr::str_remove_all(date, "-|:| "), 
            date_end = stringr::str_remove_all(date_end, "-|:| "),
            date = stringr::str_sub(date, end = 10), 
@@ -184,11 +182,10 @@ build_query_urls <- function(user, key, server, station, start, end, interval) {
 # No export
 get_envirologger_data_worker <- function(url, tz, user, key, verbose) {
   
+  # Message date and station codes
   if (verbose) {
-    
     stringr::str_split_fixed(url, "date/", 2)[, 2] %>% 
       message(date_message(), ., "...")
-    
   }
   
   # Get station from url
@@ -270,12 +267,18 @@ get_envirologger_data_worker <- function(url, tz, user, key, verbose) {
       # Add station key
       df$station <- station
       
+      # Represent missing ness with NAs
+      df <- df %>% 
+        mutate(PreScaled = if_else(PreScaled == -999, NA_real_, PreScaled),
+               Scaled = if_else(Scaled == -999, NA_real_, Scaled)) %>% 
+        as_tibble()
+      
     }
     
   } else {
   
-    # Return empty data frame, reassign tryCatch return
-    df <- data_frame()
+    # Return empty tibble, reassign tryCatch return
+    df <- tibble()
     
   }
   

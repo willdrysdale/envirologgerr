@@ -27,7 +27,7 @@ date format should be \code{yyyy-mm-dd}, but the UK locale convention of
 \code{dd/mm/yyyy} will also work. Years as strings or integers work too and 
 will be ceiling-rounded.}
 
-\item{tz}{Time-zone for the observations' dates. The default is \code{"UTC"}.}
+\item{tz}{Time zone for the observations' dates. The default is \code{"UTC"}.}
 
 \item{remove_duplicates}{Should "true" date-station-variable-value duplicates
 be removed? Default is \code{TRUE} as this is common.}

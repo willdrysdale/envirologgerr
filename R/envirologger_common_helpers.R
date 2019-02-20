@@ -11,11 +11,13 @@ base_envirologger_url <- function(user, key) {
 response_check <- function(x) {
   
   # Check
-  if (any(grepl("authentication failed", x, ignore.case = TRUE)))
+  if (any(grepl("authentication failed", x, ignore.case = TRUE))) {
     stop("API authentication failed...", call. = FALSE)
+  }
   
-  if (any(grepl("no data", x, ignore.case = TRUE)))
+  if (any(grepl("no data", x, ignore.case = TRUE))) {
     stop("No data found by API...", call. = FALSE)
+  }
     
 }
 
