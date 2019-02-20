@@ -2,17 +2,17 @@
 
 [![Build Status](https://travis-ci.org/skgrange/envirologgerr.svg?branch=master)](https://travis-ci.org/skgrange/envirologgerr)
 
-**envirologgerr** is an R interface to the [Envirologger](http://www.envirologger.com/home) [API](http://api.envirologger.net/2.0/documentation). **envirologgerr** interfaces with the default JSON interface and uses the [**jsonlite**](https://github.com/jeroenooms/jsonlite) package to parse the data format into friendly data frames (tables).
+**envirologgerr** is an R interface to the [Envirologger](http://www.airmonitors.co.uk/Air%20Monitors.net) API. **envirologgerr** interfaces with the default JSON interface and uses the [**jsonlite**](https://github.com/jeroenooms/jsonlite) package to parse the data format into friendly tibbles (tables).
 
 To gain access to the API, credentials are needed in the form of a user and key (also called account and licence keys).
 
 ## Installation
 
-To install the development version the [`devtools`](https://github.com/hadley/devtools) package will need to be installed first. Then:
+To install the development version the [`devtools`](https://github.com/hadley/devtools) or the [`remotes`](https://github.com/r-lib/remotes) package will need to be installed first. Then:
 
 ```
 # Install envirologgerr
-devtools::install_github("skgrange/envirologgerr")
+remotes::install_github("skgrange/envirologgerr")
 ```
 
 ## Usage
