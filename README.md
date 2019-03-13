@@ -23,8 +23,13 @@ remotes::install_github("skgrange/envirologgerr")
 # Define user and key...
 
 # Get some data for two made up stations
-data_test <- get_envirologger_data(user, key, server = 1, station = c(1000, 1001), 
-  start = "2016-05-01", end = "2016-05-15")
+data_test <- get_envirologger_data(
+  user,
+  key,
+  station = c(1000, 1001), 
+  start = "2016-05-01", 
+  end = "2016-05-15"
+)
 ```
 
 This will return all variables available for the two stations between the date periods. 
