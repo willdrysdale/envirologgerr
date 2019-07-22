@@ -8,9 +8,12 @@
 #' 
 #' @return Tibble. 
 #' 
+#' @seealso \href{https://api.airmonitors.net/3.5/documentation}{API Documentation}
+#' 
 #' @examples 
 #' \dontrun{
 #' 
+#' # Get units table
 #' get_envirologger_units(user, key)
 #' 
 #' }
@@ -18,11 +21,9 @@
 #' @export
 get_envirologger_units <- function(user, key) {
   
-  # Location
-  base_url <- base_envirologger_url(user, key)
-  
   # Build query
-  query <- stringr::str_c(base_url, "units")
+  query <- base_envirologger_url(user, key) %>% 
+    stringr::str_c("units")
   
   # Get response
   response <- readLines(query, warn = FALSE)
@@ -30,13 +31,11 @@ get_envirologger_units <- function(user, key) {
   # Check
   response_check(response)
   
-  # Parse
-  df <- jsonlite::fromJSON(response)
-  
-  # Clean names
-  names(df) <- str_underscore(names(df))
-  
-  df <- as_tibble(df)
+  # To tibble
+  df <- response %>% 
+    jsonlite::fromJSON() %>% 
+    purrr::set_names(str_to_underscore(names(.))) %>% 
+    as_tibble()
   
   return(df)
   

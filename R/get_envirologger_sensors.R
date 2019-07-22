@@ -8,12 +8,13 @@
 #' 
 #' @return Tibble. 
 #' 
-#' @seealso \href{https://api.airmonitors.net/3.0/documentation}{API Documentation},
+#' @seealso \href{https://api.airmonitors.net/3.5/documentation}{API Documentation},
 #' \code{\link{get_envirologger_data}}, \code{\link{get_envirologger_sensors}}
 #' 
 #' @examples 
 #' \dontrun{
 #' 
+#' # Get sensor information
 #' get_envirologger_sensors(user, key)
 #' 
 #' }
@@ -21,11 +22,9 @@
 #' @export
 get_envirologger_sensors <- function(user, key) {
   
-  # Location
-  base_url <- base_envirologger_url(user, key)
-  
   # Build query
-  query <- stringr::str_c(base_url, "sensors")
+  query <- base_envirologger_url(user, key) %>% 
+    stringr::str_c("sensors")
   
   # Get response
   response <- readLines(query, warn = FALSE)
@@ -33,19 +32,10 @@ get_envirologger_sensors <- function(user, key) {
   # Check
   response_check(response)
   
-  # Parse
-  df <- jsonlite::fromJSON(response)
-  
-  # Clean names
-  names(df) <- str_underscore(names(df))
-  
-  # Lower case and trim the label variable
-  df$label <- stringr::str_to_lower(df$label)
-  df$label <- stringr::str_trim(df$label)
-  
-  # Arrange
-  df <- df %>% 
-    arrange(sensor_id) %>% 
+  # Parse and clean a bit
+  df <- jsonlite::fromJSON(response) %>% 
+    purrr::set_names(str_to_underscore(names(.))) %>% 
+    arrange(sensor_label) %>% 
     as_tibble()
 
   return(df)

@@ -8,12 +8,13 @@
 #' 
 #' @return Tibble. 
 #' 
-#' @seealso \href{https://api.airmonitors.net/3.0/documentation}{API Documentation},
+#' @seealso \href{https://api.airmonitors.net/3.5/documentation}{API Documentation},
 #' \code{\link{get_envirologger_data}}
 #' 
 #' @examples 
 #' \dontrun{
 #' 
+#' # Get station information
 #' get_envirologger_stations(user, key)
 #' 
 #' }
@@ -21,11 +22,9 @@
 #' @export
 get_envirologger_stations <- function(user, key) {
   
-  # Location
-  base_url <- base_envirologger_url(user, key)
-  
   # Build query
-  query <- stringr::str_c(base_url, "stations")
+  query <- base_envirologger_url(user, key) %>% 
+    stringr::str_c("stations")
   
   # Get response
   response <- readLines(query, warn = FALSE)
@@ -33,19 +32,13 @@ get_envirologger_stations <- function(user, key) {
   # Check
   response_check(response)
   
-  # Parse
-  df <- jsonlite::fromJSON(response)
-  
-  # Clean names
-  names(df) <- str_underscore(names(df))
-  names(df) <- ifelse(names(df) == "unique_id", "station", names(df))
-  
-  # Data types
-  df$latitude <- as.numeric(df$latitude)
-  df$longitude <- as.numeric(df$longitude)
-  
-  # Arrange
-  df <- df %>% 
+  # Parse and clean table a bit
+  df <- jsonlite::fromJSON(response) %>% 
+    purrr::set_names(str_to_underscore(names(.))) %>% 
+    rename(station = unique_id) %>% 
+    mutate(latitude = as.numeric(latitude),
+           longitude = as.numeric(longitude),
+           altitude = as.numeric(altitude)) %>% 
     arrange(station) %>% 
     as_tibble()
   

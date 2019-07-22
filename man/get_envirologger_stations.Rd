@@ -20,13 +20,14 @@ Function to get available Envirologger API monitoring stations for a user.
 \examples{
 \dontrun{
 
+# Get station information
 get_envirologger_stations(user, key)
 
 }
 
 }
 \seealso{
-\href{https://api.airmonitors.net/3.0/documentation}{API Documentation},
+\href{https://api.airmonitors.net/3.5/documentation}{API Documentation},
 \code{\link{get_envirologger_data}}
 }
 \author{

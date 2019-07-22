@@ -60,7 +60,7 @@ data_air <- get_envirologger_data(
 
 }
 \seealso{
-\href{https://api.airmonitors.net/3.0/documentation}{API Documentation},
+\href{https://api.airmonitors.net/3.5/documentation}{API Documentation},
 \code{\link{get_envirologger_stations}}
 }
 \author{

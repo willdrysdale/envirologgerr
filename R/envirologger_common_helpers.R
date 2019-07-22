@@ -1,7 +1,7 @@
 base_envirologger_url <- function(user, key) {
   
   # Build base
-  base_url <- "https://api.airmonitors.net/3.0/interface/"
+  base_url <- "https://api.airmonitors.net/3.5/GET/"
   base_url <- stringr::str_c(base_url, user, "/", key, "/")
   return(base_url)
   
@@ -47,7 +47,7 @@ parse_date_arguments <- function (date, type, tz = "UTC") {
 }
 
 
-str_underscore <- function(x) {
+str_to_underscore <- function(x) {
   x <- gsub("([A-Za-z])([A-Z])([a-z])", "\\1_\\2\\3", x)
   x <- gsub(".", "_", x, fixed = TRUE)
   x <- gsub(":", "_", x, fixed = TRUE)

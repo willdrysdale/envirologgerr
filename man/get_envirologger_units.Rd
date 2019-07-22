@@ -20,10 +20,14 @@ Function to get units data from Envirologger API.
 \examples{
 \dontrun{
 
+# Get units table
 get_envirologger_units(user, key)
 
 }
 
+}
+\seealso{
+\href{https://api.airmonitors.net/3.5/documentation}{API Documentation}
 }
 \author{
 Stuart K. Grange

@@ -32,7 +32,7 @@
 #' 
 #' @return Tibble. 
 #' 
-#' @seealso \href{https://api.airmonitors.net/3.0/documentation}{API Documentation},
+#' @seealso \href{https://api.airmonitors.net/3.5/documentation}{API Documentation},
 #' \code{\link{get_envirologger_stations}}
 #' 
 #' @examples 
@@ -69,36 +69,32 @@ get_envirologger_data <- function(user, key, station, start = NA,
   if (!nrow(df) == 0) {
     
     # Clean names
-    names(df) <- str_underscore(names(df))
+    names(df) <- str_to_underscore(names(df))
     names(df) <- if_else(names(df) == "pre_scaled", "value", names(df))
     
     # Remove true value duplicates
     if (remove_duplicates) {
-      
       df <- df %>% 
         distinct(date,
                  station,
-                 channel_number,
+                 channel,
                  value,
                  .keep_all = TRUE)
-      
     }
     
     # Arrange variable order and arrange observations
     df <- df %>% 
       select(date, 
+             date_end,
              station, 
-             sensor_id, 
+             sensor_label, 
              value, 
              everything()) %>% 
       arrange(station, 
-              channel_number)
+              channel)
     
   } else {
-    
-    # No data to return
     df <- tibble()
-    
   }
   
   return(df)
@@ -133,21 +129,16 @@ build_query_urls <- function(user, key, server, station, start, end, interval) {
            date_end_lag = if_else(is.na(date_end_lag), date_end, date_end_lag),
            date = if_else(is.na(date), date_end, date),
            date = if_else(date == date_end_lag, date + 60, date),
-           date = stringr::str_remove_all(date, "-|:| "), 
-           date_end = stringr::str_remove_all(date_end, "-|:| "),
-           date = stringr::str_sub(date, end = 10), 
-           date_end = stringr::str_sub(date_end, end = 10)) %>% 
+           date = parsedate::format_iso_8601(date),
+           date_end = parsedate::format_iso_8601(date_end)) %>% 
     filter(!is.na(date_end)) %>% 
     select(-date_end_lag)
-  
+    
   # Could use end = 12, but issues arrise, first query is ignored. API behaviour? 
   
   # Vectorise over site too
   if (length(station) == 1) {
-    
-    # Just add station
     df$station <- station
-    
   } else {
     
     # Replicate dates
@@ -197,38 +188,23 @@ get_envirologger_data_worker <- function(url, tz, user, key, verbose) {
     
     # Get response as text
     text <- readLines(url, warn = FALSE)
-    
-    # Check response
     response_check(text)
-    
-    # Return
     text
     
   }, warning = function(w) {
-    
-    # Return
     NULL
-    
   }, error = function(e) {
-    
-    # Return
     NULL
-    
   })
   
   # Check for discontinued string, null behaves differently in the logic
   if (!is.null(response)) {
-    
     if (any(grepl("discontinued", response, ignore.case = TRUE))) {
-      
       # For the user
       warning("API is reporting that it has been discontinued...", call. = FALSE)
-      
       # Keep logic the same
       response <- NULL
-      
     }
-    
   }
   
   # If we get a return, make a nice data frame
@@ -236,30 +212,24 @@ get_envirologger_data_worker <- function(url, tz, user, key, verbose) {
     
     # Catch is for rare issues with EOF errors caused by api
     response <- tryCatch({
-      
-      # Parse
       jsonlite::fromJSON(response)
-      
     }, error = function(e) {
-      
       NULL
-      
     })
     
     # Another catch
     if (!is.null(response)) {
       
       # Get dates
-      date <- response$Timestamp
-      
-      # Parse dates
-      date <- lubridate::ymd_hms(date, tz = tz)
+      date <- lubridate::ymd_hms(response$TBTimestamp, tz = tz)
+      date_end <- lubridate::ymd_hms(response$TETimestamp, tz = tz)
       
       # Get observations
       df <- response$Channels
       
       # Insert date into observations, an odd piece of code
       df <- mapply(cbind, df, "date" = date, SIMPLIFY = FALSE)
+      df <- mapply(cbind, df, "date_end" = date, SIMPLIFY = FALSE)
       
       # Create data frame
       df <- dplyr::bind_rows(df)
@@ -276,10 +246,7 @@ get_envirologger_data_worker <- function(url, tz, user, key, verbose) {
     }
     
   } else {
-  
-    # Return empty tibble, reassign tryCatch return
     df <- tibble()
-    
   }
   
   return(df)

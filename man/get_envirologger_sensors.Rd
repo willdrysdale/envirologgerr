@@ -20,13 +20,14 @@ Function to get available Envirologger API monitoring sensors.
 \examples{
 \dontrun{
 
+# Get sensor information
 get_envirologger_sensors(user, key)
 
 }
 
 }
 \seealso{
-\href{https://api.airmonitors.net/3.0/documentation}{API Documentation},
+\href{https://api.airmonitors.net/3.5/documentation}{API Documentation},
 \code{\link{get_envirologger_data}}, \code{\link{get_envirologger_sensors}}
 }
 \author{
