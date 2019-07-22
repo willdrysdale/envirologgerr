@@ -1,7 +1,7 @@
 Package: envirologgerr
 Type: Package
 Title: An R Interface to the Envirologger API
-Version: 0.2.0
+Version: 0.2.1
 Date: 2019-07-22
 Authors@R: person("Stuart K.", "Grange", email = "s.k.grange@gmail.com", 
     role = c("cre", "aut"), comment = c(ORCID = "0000-0003-4093-3596"))

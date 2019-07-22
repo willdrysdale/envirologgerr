@@ -91,7 +91,8 @@ get_envirologger_data <- function(user, key, station, start = NA,
              value, 
              everything()) %>% 
       arrange(station, 
-              channel)
+              channel,
+              date)
     
   } else {
     df <- tibble()
@@ -242,6 +243,9 @@ get_envirologger_data_worker <- function(url, tz, user, key, verbose) {
         mutate(PreScaled = if_else(PreScaled == -999, NA_real_, PreScaled),
                Scaled = if_else(Scaled == -999, NA_real_, Scaled)) %>% 
         as_tibble()
+      
+      # Status = stringr::str_to_lower(Status),
+      # Status = stringr::str_replace_all(Status, " ", "_")
       
     }
     
