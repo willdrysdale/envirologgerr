@@ -155,7 +155,7 @@ build_query_urls <- function(user, key, server, station, start, end, interval) {
   
   # Build query strings
   url <- stringr::str_c(
-    "stationdata/date/", 
+    "devicedata/", 
     df$date, "/", 
     df$date_end, "/",
     df$station
@@ -181,7 +181,7 @@ get_envirologger_data_worker <- function(url, tz, user, key, verbose) {
   }
   
   # Get station from url
-  station <- stringr::str_split_fixed(url, "/", 12)[, 12]
+  station <- stringr::str_split_fixed(url, "/", 11)[, 11]
   station <- as.numeric(station)
   
   # Get response

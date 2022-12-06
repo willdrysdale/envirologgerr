@@ -24,7 +24,7 @@ get_envirologger_stations <- function(user, key) {
   
   # Build query
   query <- base_envirologger_url(user, key) %>% 
-    stringr::str_c("stations")
+    stringr::str_c("devices")
   
   # Get response
   response <- readLines(query, warn = FALSE)
