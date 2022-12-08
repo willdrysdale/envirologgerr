@@ -35,7 +35,7 @@ get_envirologger_sensors <- function(user, key) {
   # Parse and clean a bit
   df <- jsonlite::fromJSON(response) %>% 
     purrr::set_names(str_to_underscore(names(.))) %>% 
-    arrange(sensor_label) %>% 
+    arrange(label) %>% 
     as_tibble()
 
   return(df)
