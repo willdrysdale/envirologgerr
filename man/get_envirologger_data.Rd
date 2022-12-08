@@ -4,9 +4,17 @@
 \alias{get_envirologger_data}
 \title{Function to get observational data from Envirologger API.}
 \usage{
-get_envirologger_data(user, key, station, start = NA, end = NA,
-  tz = "UTC", remove_duplicates = TRUE, interval = "24 hour",
-  verbose = FALSE)
+get_envirologger_data(
+  user,
+  key,
+  station,
+  start = NA,
+  end = NA,
+  tz = "UTC",
+  remove_duplicates = TRUE,
+  interval = "24 hour",
+  verbose = FALSE
+)
 }
 \arguments{
 \item{user}{An Envirologger API user-name.}
