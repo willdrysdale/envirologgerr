@@ -70,7 +70,7 @@ get_envirologger_data <- function(user, key, station, start = NA,
     
     # Clean names
     names(df) <- str_to_underscore(names(df))
-    names(df) <- if_else(names(df) == "pre_scaled", "value", names(df))
+    names(df) <- if_else(names(df) == "pre_scaled_reading", "value", names(df))
     
     # Remove true value duplicates
     if (remove_duplicates) {
@@ -85,7 +85,6 @@ get_envirologger_data <- function(user, key, station, start = NA,
     # Arrange variable order and arrange observations
     df <- df %>% 
       select(date, 
-             date_end,
              station, 
              sensor_label, 
              value, 
@@ -220,33 +219,14 @@ get_envirologger_data_worker <- function(url, tz, user, key, verbose) {
     
     # Another catch
     if (!is.null(response)) {
-      
-      # Get dates
-      date <- lubridate::ymd_hms(response$TBTimestamp, tz = tz)
-      date_end <- lubridate::ymd_hms(response$TETimestamp, tz = tz)
-      
-      # Get observations
-      df <- response$Channels
-      
-      # Insert date into observations, an odd piece of code
-      df <- mapply(cbind, df, "date" = date, SIMPLIFY = FALSE)
-      df <- mapply(cbind, df, "date_end" = date, SIMPLIFY = FALSE)
-      
-      # Create data frame
-      df <- dplyr::bind_rows(df)
-      
-      # Add station key
-      df$station <- station
-      
       # Represent missing ness with NAs
-      df <- df %>% 
-        mutate(PreScaled = if_else(PreScaled == -999, NA_real_, PreScaled),
-               Scaled = if_else(Scaled == -999, NA_real_, Scaled)) %>% 
-        as_tibble()
-      
-      # Status = stringr::str_to_lower(Status),
-      # Status = stringr::str_replace_all(Status, " ", "_")
-      
+      df <- purrr::map_dfr(response, parse_observation, tz) |>
+              mutate(
+                station = station,
+                PreScaled.Reading = if_else(PreScaled.Reading == -999, NA_real_, PreScaled.Reading),
+                Scaled.Reading = if_else(Scaled.Reading == -999, NA_real_, Scaled.Reading)
+              ) %>%
+              as_tibble()
     }
     
   } else {
@@ -255,4 +235,26 @@ get_envirologger_data_worker <- function(url, tz, user, key, verbose) {
   
   return(df)
   
+}
+
+parse_observation <- function(item, tz) {
+  # Get date
+  # NB: used to return date and date_end as the API used to return both ends
+  # of the window. However, it now only returns a single timestamp corresponding
+  # to the selected time averaging convention
+  date <- lubridate::ymd_hms(item$Timestamp$Timestamp, tz = tz)
+  
+  # Get observations, note there are nested data frames so use flatten
+  # And the Flags are lists as can have multiple flags per timepoint, so flatten
+  # into single comma separated string
+  df <- jsonlite::flatten(item$Channels) %>%
+    mutate(
+      date = date,
+      PreScaled.Flags = vapply(PreScaled.Flags, 
+                               paste, '', 
+                               collapse = ','),
+      Scaled.Flags = vapply(Scaled.Flags, 
+                            paste, '', 
+                            collapse = ',')
+    )
 }
