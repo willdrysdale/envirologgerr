@@ -23,7 +23,8 @@ Imports:
     XML,
     magrittr,
     purrr,
-    parsedate
+    parsedate,
+    tidyr
 Suggests:
     openair
 Encoding: UTF-8

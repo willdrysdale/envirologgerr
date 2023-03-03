@@ -53,7 +53,8 @@
 #' @export
 get_envirologger_data <- function(user, key, station, start = NA, 
                                   end = NA, tz = "UTC", remove_duplicates = TRUE, 
-                                  interval = "24 hour", verbose = FALSE) {
+                                  interval = "24 hour", verbose = FALSE,
+                                  .progress = TRUE) {
   
   # Build query strings for api
   urls <- build_query_urls(user, key, server, station, start, end, interval)
@@ -63,7 +64,8 @@ get_envirologger_data <- function(user, key, station, start = NA,
     urls, 
     get_envirologger_data_worker, 
     tz = tz, 
-    verbose = verbose
+    verbose = verbose,
+    .progress = .progress
   )
   
   if (!nrow(df) == 0) {
@@ -85,7 +87,7 @@ get_envirologger_data <- function(user, key, station, start = NA,
     # Arrange variable order and arrange observations
     df <- df %>% 
       select(date, 
-             date_end,
+             date_type,
              station, 
              sensor_label, 
              value, 
@@ -134,7 +136,7 @@ build_query_urls <- function(user, key, server, station, start, end, interval) {
            date_end = parsedate::format_iso_8601(date_end)) %>% 
     filter(!is.na(date_end)) %>% 
     select(-date_end_lag)
-    
+  
   # Could use end = 12, but issues arrise, first query is ignored. API behaviour? 
   
   # Vectorise over site too
@@ -221,31 +223,28 @@ get_envirologger_data_worker <- function(url, tz, user, key, verbose) {
     # Another catch
     if (!is.null(response)) {
       
-      # Get dates
-      date <- lubridate::ymd_hms(response$TBTimestamp, tz = tz)
-      date_end <- lubridate::ymd_hms(response$TETimestamp, tz = tz)
-      
-      # Get observations
-      df <- response$Channels
-      
-      # Insert date into observations, an odd piece of code
-      df <- mapply(cbind, df, "date" = date, SIMPLIFY = FALSE)
-      df <- mapply(cbind, df, "date_end" = date, SIMPLIFY = FALSE)
-      
-      # Create data frame
-      df <- dplyr::bind_rows(df)
-      
-      # Add station key
-      df$station <- station
-      
-      # Represent missing ness with NAs
-      df <- df %>% 
-        mutate(PreScaled = if_else(PreScaled == -999, NA_real_, PreScaled),
-               Scaled = if_else(Scaled == -999, NA_real_, Scaled)) %>% 
-        as_tibble()
-      
-      # Status = stringr::str_to_lower(Status),
-      # Status = stringr::str_replace_all(Status, " ", "_")
+      df = purrr::map_dfr(response,
+                          ~{
+                            date = purrr::pluck(.x,"Timestamp","Timestamp")
+                            date_type = purrr::pluck(.x, "Timestamp","Convention")
+                            purrr::pluck(.x,"Channels") %>% 
+                              dplyr::mutate(date = date,
+                                            date_type = date_type)}
+      ) %>% 
+        as_tibble() %>% 
+        dplyr::mutate(PreScaled = PreScaled %>% # rename the new structure of PreScaled and Scaled, ready to unnest
+                        dplyr::rename(PreScaled = Reading,
+                                      PreScaledValidPercentage = ValidPercentage,
+                                      PreScaledFlags = Flags),
+                      Scaled = Scaled %>% 
+                        dplyr::rename(Scaled = Reading,
+                                      ScaledValidPercentage = ValidPercentage,
+                                      ScaledFlags = Flags)) %>% 
+        tidyr::unnest(c(PreScaled, Scaled)) %>% 
+        dplyr::mutate(station = station,
+                      PreScaled = dplyr::if_else(PreScaled == -999, NA_real_, PreScaled),
+                      Scaled = dplyr::if_else(Scaled == -999, NA_real_, Scaled)) %>% 
+        dplyr::relocate(date)
       
     }
     
